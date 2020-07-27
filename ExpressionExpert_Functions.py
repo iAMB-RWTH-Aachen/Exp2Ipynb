@@ -62,8 +62,8 @@ def Data_Src_Load(Name_Dict):
     if Stats2Samples:
         SeqDat = SeqDat_StatsExpand(SeqDat, Name_Dict)
     
-    SeqDat['Sequence_label-encrypted'] = list_integer(SeqDat[Seq_Col])
-    SeqDat['Sequence_letter-encrypted'] = SeqDat[Seq_Col]
+    SeqDat['Sequence_label-encrypted'] = list_integer(SeqDat[Seq_Col].str.upper())
+    SeqDat['Sequence_letter-encrypted'] = SeqDat[Seq_Col].str.upper()
     SeqDat['Sequence'] = list_onehot(SeqDat['Sequence_label-encrypted'])
     # GC content calculation
     NuclSum = [np.sum(SeqDat['Sequence'][i], axis=0) for i in range(len(SeqDat))]
@@ -89,15 +89,13 @@ def list_integer(SeqList):
     Output:
         IntegerList:   list; numerical label encryption of letters A-0, C-1, G-2, T-3
     '''
+    from sklearn.preprocessing import LabelEncoder
+    
     alphabet = 'ACGT'
-    char_to_int = dict((c,i) for i,c in enumerate(alphabet))
-    IntegerList = list()
-    for mySeq in SeqList:    
-        # integer encode input data
-        integer_encoded = [char_to_int[char] for char in mySeq.upper()]
-        IntegerList.append(integer_encoded)
-    return IntegerList
-        
+    LabEnc = LabelEncoder().fit(list(alphabet))
+    IntegerList = [LabEnc.transform(list(i)) for i in SeqList]
+    return IntegerList    
+            
 def list_onehot(IntegerList):
     '''
     Generate one-hot encoding.

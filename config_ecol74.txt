@@ -1,16 +1,16 @@
 # This file contains the naming conventions for all output files. It is automatically generated when going through step "0-Workflow".
-Data_File: Example1-Pput.csv
+Data_File: dengyu_Ecol_74.csv
 Sequence_column: Sequence
-Y_Col_Name: ['Promoter Activity']
-ID_Col_Name: Strain ID
+Y_Col_Name: ['Activity']
+ID_Col_Name: Name
 Stats2Samples: False
 Stats_Std: ['Error']
 Stats_Samples: ['Samples']
 Library_Expression: 1
 Add_Feat: ['GC-content']
 Figure_Type: png
-File_Base: Example1-Pput
-Data_Folder: data-Example1-Pput
+File_Base: dengyu_Ecol_74
+Data_Folder: data-dengyu_Ecol_74
 HM_File: Plot_PositionNucleotideStats
 SampSeqDist_File: Plot_SampleSequenceDistance
 Entropy_File: Plot_PositionEntropy
@@ -23,8 +23,8 @@ X_Expr: Plot_CrossExpr
 RefSeq: 
 ML_Regressor: RFR
 Data_Standard: False
-SynLib_Date: 20200703
-ML_Date: 20200703
+SynLib_Date: 20200702
+ML_Date: 20200702
 TestRatio: 0.1
 Expression_Unit: GFP Activity
 Sequence_Distance_cutoff: 0.9
