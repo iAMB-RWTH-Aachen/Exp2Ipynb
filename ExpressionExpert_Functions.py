@@ -62,6 +62,15 @@ def Data_Src_Load(Name_Dict):
     if Stats2Samples:
         SeqDat = SeqDat_StatsExpand(SeqDat, Name_Dict)
     
+    # testing whether all sequences have the same length
+    # sequences deviating from the median length are deleted
+    SLvec = list()
+    for item in SeqDat[Seq_Col]:
+        SLvec.append(len(item))
+    SequenceLengthError = np.where(np.array(SLvec)!=np.median(SLvec))
+    SeqDat.drop(SeqDat.index[SequenceLengthError], inplace=True)
+    SeqDat.reset_index(inplace=True)
+    
     SeqDat['Sequence_label-encrypted'] = list_integer(SeqDat[Seq_Col].str.upper())
     SeqDat['Sequence_letter-encrypted'] = SeqDat[Seq_Col].str.upper()
     SeqDat['Sequence'] = list_onehot(SeqDat['Sequence_label-encrypted'])
@@ -843,6 +852,11 @@ def generate_distances(SeqDat, Name_Dict, Hist_Type):
         mydist:        matrix, contains pairwise sequence distances, either to reference or to all sequences
     '''
     import numpy as np
+    
+    # if there are too many samples pair-wise distance over all samples is too costly computationally
+    # The distance based on reference sequence is similar to the pairwise distance
+    if len(SeqDat) > 1000:
+        Hist_Type = 1
     
     # distances are determined relative to reference
     if Hist_Type == 1:
