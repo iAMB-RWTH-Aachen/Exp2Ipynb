@@ -669,7 +669,7 @@ def SequenceRandomizer_Single(RefSeq, Base_SequencePosition):
     # following, non-tested nucleotides are deleted
     Pos_Del, Nucl_Del = np.where(mytmp.values == 0)
     if not Pos_Del.any(): # != '':
-        print('deleting non-tested nucleotides')        
+        # deleting non-tested nucleotides
         myArr[tuple([Pos_Del,Nucl_Del])] = 'X'
     # Generating a reference sequence to work with
     TstSeq = list(RefSeq)
