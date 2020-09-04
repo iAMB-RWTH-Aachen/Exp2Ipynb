@@ -9,8 +9,6 @@ Stats_Samples: ['Sampling']
 Library_Expression: 1
 Add_Feat: ['GC-content']
 Figure_Type: png
-File_Base: liu_bacillus
-Data_Folder: data-liu_bacillus
 HM_File: Plot_PositionNucleotideStats
 SampSeqDist_File: Plot_SampleSequenceDistance
 Entropy_File: Plot_PositionEntropy

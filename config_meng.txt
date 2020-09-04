@@ -9,8 +9,6 @@ Stats_Samples: None
 Library_Expression: 1
 Add_Feat: ['GC-content']
 Figure_Type: png
-File_Base: meng
-Data_Folder: data-meng
 HM_File: Plot_PositionNucleotideStats
 SampSeqDist_File: Plot_SampleSequenceDistance
 Entropy_File: Plot_PositionEntropy

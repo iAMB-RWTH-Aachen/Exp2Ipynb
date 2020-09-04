@@ -9,8 +9,6 @@ Stats_Samples: ['GFP N', 'mOrange N']
 Library_Expression: 2
 Add_Feat: ['GC-content']
 Figure_Type: png
-File_Base: Geobacillus_Love
-Data_Folder: data-Geobacillus_Love
 HM_File: Plot_PositionNucleotideStats
 SampSeqDist_File: Plot_SampleSequenceDistance
 Entropy_File: Plot_PositionEntropy

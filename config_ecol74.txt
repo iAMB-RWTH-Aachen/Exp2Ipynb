@@ -9,8 +9,6 @@ Stats_Samples: ['Samples']
 Library_Expression: 1
 Add_Feat: ['GC-content']
 Figure_Type: png
-File_Base: dengyu_Ecol_74
-Data_Folder: data-dengyu_Ecol_74
 HM_File: Plot_PositionNucleotideStats
 SampSeqDist_File: Plot_SampleSequenceDistance
 Entropy_File: Plot_PositionEntropy

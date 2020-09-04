@@ -9,8 +9,6 @@ Stats_Samples: ['Samples']
 Library_Expression: 1
 Add_Feat: ['GC-content']
 Figure_Type: png
-File_Base: Example1-Pput
-Data_Folder: data-Example1-Pput
 HM_File: Plot_PositionNucleotideStats
 SampSeqDist_File: Plot_SampleSequenceDistance
 Entropy_File: Plot_PositionEntropy
