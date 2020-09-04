@@ -13,6 +13,39 @@ Date: 2020, May
 ###########################################################################
 ###########################################################################
 
+def init_Exp2(config_File):
+    '''
+    Parameter initialization for ExpressionExpertIpynb.
+    
+    Input:
+        config_File:    string; file address of the configuration file with parameters for statistical analysis and regression.
+        
+    Output:
+        Name_Dict:      dictionary; parameter dictionary
+    '''
+    Name_Dict = dict()
+    with open(config_File) as Conf:
+        myline = Conf.read().splitlines()
+        for line in myline:
+            if not line.startswith('#'):
+                (key, val) = line.split(':', 1)
+                Name_Dict[str(key.strip())] = val.strip()
+#     Data_File = Name_Dict['Data_File']
+#     # extract the filename for naming of newly generated files
+#     File_Base = Name_Dict['File_Base']
+#     # the generated files will be stored in a subfolder with custom name
+#     Data_Folder = 'data-{}'.format(File_Base)    # column name of expression values
+#     Y_Col_Name = eval(Name_Dict['Y_Col_Name'])
+#     # Extracting entropy cutoff for removal of non-informative positions
+#     Entropy_cutoff = float(Name_Dict['Entropy_cutoff'])
+#     # figure file type
+#     Fig_Type = Name_Dict['Figure_Type']
+#     # Figure font size
+#     FigFontSize = Name_Dict['Figure_Font_Size']
+    make_DataDir(Name_Dict)
+    
+    return Name_Dict
+
 def make_DataDir(Name_Dict):
     '''
     Set-up of directory for data storage.
