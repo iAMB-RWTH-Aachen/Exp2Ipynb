@@ -19,13 +19,13 @@ CorrPlot_File: Plot_Corr-Ytrue-VS-Ypred
 Csv_ID: Synth-Library
 X_Expr: Plot_CrossExpr
 RefSeq: 
-ML_Regressor: SVR
-Data_Standard: True
+ML_Regressor: RFR
+Data_Standard: False
 SynLib_Date: 20200615
-ML_Date: 20200812
+ML_Date: 20200925
 TestRatio: 0.1
 Expression_Unit: Relative activity
 Sequence_Distance_cutoff: 0.11
-Entropy_cutoff: 0.2
+Entropy_cutoff: 0.5
 Synth_Seq_MaxNumber: 10000
 Figure_Font_Size: 18

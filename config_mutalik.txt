@@ -1,8 +1,10 @@
+# 20200925
 # This file contains the naming conventions for all output files. It is automatically generated when going through step "0-Workflow".
-Data_File: Example1-Pput.csv
-Sequence_column: Sequence
-Y_Col_Name: ['Promoter Activity']
-ID_Col_Name: Strain ID
+Data_File: mutalik12_Ecol.csv
+Sequence_column: Short sequences
+Y_Col_Name: ['sE oexp']
+ID_Col_Name: Promoter
+Revome_Outlier: False
 Stats2Samples: False
 Stats_Std: ['Error']
 Stats_Samples: ['Samples']
@@ -21,11 +23,11 @@ X_Expr: Plot_CrossExpr
 RefSeq: 
 ML_Regressor: RFR
 Data_Standard: False
-SynLib_Date: 20200703
-ML_Date: 20200703
+SynLib_Date: 20200925
+ML_Date: 20200925
 TestRatio: 0.1
-Expression_Unit: GFP Activity
+Expression_Unit: Expression
 Sequence_Distance_cutoff: 0.9
-Entropy_cutoff: 0.2
+Entropy_cutoff: 1
 Synth_Seq_MaxNumber: 10000
 Figure_Font_Size: 18

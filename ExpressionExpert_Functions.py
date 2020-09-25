@@ -89,7 +89,25 @@ def Data_Src_Load(Name_Dict):
 
     DataPath = Name_Dict['Data_File']
     Seq_Col = Name_Dict['Sequence_column']
+    ID_Col_Name = Name_Dict['ID_Col_Name']
+    Y_Col_Name = eval(Name_Dict['Y_Col_Name'])
+    if 'Revome_Outlier' in Name_Dict:
+        Remove_Outlier = eval(Name_Dict['Revome_Outlier'])
+    else:
+        Remove_Outlier = False
+
     SeqDat = pd.read_csv(DataPath, delimiter=',|;', engine='python')
+    # decision whether to delete samples identified as outlier
+    # outlier are defined as farther than 3x of standard deviation from the mean value
+    if Remove_Outlier:
+        myOutlier=list()
+        for Measurement in Y_Col_Name:
+            myOutlier.append(DetectOutlier(SeqDat[Measurement]))
+        myOutlier = np.array(myOutlier).ravel()
+        print('Following outliers were detected: ID: {}, Value: {}'.format(SeqDat.loc[myOutlier, ID_Col_Name].values,SeqDat.loc[myOutlier, Y_Col_Name].values))
+        SeqDat.drop(myOutlier, inplace=True)
+        SeqDat.reset_index(inplace=True)
+    
     # decision whether additional data is generated from statistics, this requires mean standard deviation and sample size
     Stats2Samples = eval(Name_Dict['Stats2Samples'])
     if Stats2Samples:
@@ -563,8 +581,10 @@ def MyRFR(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', 
     groups = SeqOH['Sequence_letter-encrypted']
     Number_Estimators = np.arange(20,40,2)
     Max_Features = np.arange(10,30,2)
-    min_samples_split = np.arange(2,4,1)
-    param_grid = [{'bootstrap':[False], 'n_estimators': Number_Estimators, 'max_features': Max_Features, 'min_samples_split': min_samples_split}]
+    min_samples_split = np.arange(3,4,1)
+    max_depth = np.arange(3,5)
+    min_samples_leaf = np.array([2])
+    param_grid = [{'bootstrap':[False], 'n_estimators': Number_Estimators, 'max_features': Max_Features, 'min_samples_split': min_samples_split, 'max_depth':max_depth, 'min_samples_leaf':min_samples_leaf}]
     # Group shuffle split removes groups with identical sequences from the development set
     # This is more realistic for parameter estimation
     cv = GroupShuffleSplit(n_splits=Num, test_size=Validation_cutoff, random_state=42)
@@ -939,6 +959,27 @@ def my_CrossValScore(X, Y, groups, cv, ML_fun, metric):
         
     myscores = dict({'TrainR2':mytrain})
     return myscores
+    
+###########################################################################
+###########################################################################
+    
+def DetectOutlier(myData):
+    '''
+    Function to identify outlier in one dimensional input. Outlier are detected as being more distant than three times the standard deviation from the mean value.
+    '''
+    import numpy as np
+    
+    myMean = np.mean(myData)
+    myStd = np.std(myData)
+
+    # Outliers defined as exceeding 3x std
+    OutThresh = 3
+    LowerLimit = myMean - myStd*OutThresh
+    UpperLimit = myMean + myStd*OutThresh
+
+    myOutlier = [indx for indx, val in enumerate(myData) if val > UpperLimit or val < LowerLimit]
+
+    return myOutlier
     
 ###########################################################################
 ###########################################################################
