@@ -85,17 +85,22 @@ def Data_Src_Load(Name_Dict):
 #     import os
     import numpy as np
     import pandas as pd
+    from sklearn.preprocessing import StandardScaler
 #     from ExpressionExpert_Functions import list_integer, list_onehot
 
     DataPath = Name_Dict['Data_File']
     Seq_Col = Name_Dict['Sequence_column']
     ID_Col_Name = Name_Dict['ID_Col_Name']
     Y_Col_Name = eval(Name_Dict['Y_Col_Name'])
+    ML_Regressor = Name_Dict['ML_Regressor']
+    Response_Value = eval(Name_Dict['Response_Value'])
+    
     if 'Revome_Outlier' in Name_Dict:
         Remove_Outlier = eval(Name_Dict['Revome_Outlier'])
     else:
         Remove_Outlier = False
 
+    
     SeqDat = pd.read_csv(DataPath, delimiter=',|;', engine='python')
     # decision whether to delete samples identified as outlier
     # outlier are defined as farther than 3x of standard deviation from the mean value
@@ -120,7 +125,7 @@ def Data_Src_Load(Name_Dict):
         SLvec.append(len(item))
     SequenceLengthError = np.where(np.array(SLvec)!=np.median(SLvec))
     SeqDat.drop(SeqDat.index[SequenceLengthError], inplace=True)
-    SeqDat.reset_index(inplace=True)
+#     SeqDat.reset_index(inplace=True)
     
     SeqDat['Sequence_label-encrypted'] = list_integer(SeqDat[Seq_Col].str.upper())
     SeqDat['Sequence_letter-encrypted'] = SeqDat[Seq_Col].str.upper()
@@ -130,6 +135,38 @@ def Data_Src_Load(Name_Dict):
     GCcont = np.sum(np.delete(np.vstack(NuclSum),[0,3],1), axis=1)/np.sum(np.vstack(NuclSum)[0])
     SeqDat['GC-content'] = GCcont
         
+    # Categorization of expression
+    # Extracting the last letter of the abbreviation of the ML approach.
+    # If the last letter is a 'R', a regression is chosen, if 'C' a classification is chosen.
+    # If classification is used, the expression results are categorized
+    if Response_Value == 0:
+        # using standardized data with zero mean and unit variance
+        print('Standardizing of expression.')
+        for Measurement in Y_Col_Name:
+            myScaler = StandardScaler()
+            TargetName = '{}_ML'.format(Measurement)
+            myData = SeqDat[Measurement].values.reshape(-1, 1)
+            SeqDat[TargetName] = myScaler.fit_transform(myData)
+        
+    elif Response_Value == 1:
+        print('Original values of expression.')
+        for Measurement in Y_Col_Name:
+            TargetName = '{}_ML'.format(Measurement)
+            SeqDat[TargetName] = SeqDat[Measurement]
+            
+    elif Response_Value > 1:
+        print('Categorization of expression.')
+        BinNum = Response_Value
+        for Measurement in Y_Col_Name:
+            CatName = '{}_ML'.format(Measurement)
+            SeqDat[CatName] = pd.qcut(SeqDat[Measurement], q=BinNum, labels=range(BinNum))
+        SeqDat.drop_duplicates('Sequence_letter-encrypted', inplace=True)    
+        
+    else:
+        print('Response value parameter must be an positive integer number')
+    SeqDat.reset_index(inplace=True)
+    
+
     return SeqDat
 
 ###########################################################################
@@ -200,7 +237,7 @@ def ExpressionScaler(SeqDat, Name_Dict):
     Expr_Scaler = dict()
     Expr_Scaler_n = StandardScaler() 
     for idx in range(Measurement_Number):
-        Column_Name = '{}_scaled'.format(Y_Col_Name[idx])
+        Column_Name = '{}_ML'.format(Y_Col_Name[idx])
         myData = SeqDat[Y_Col_Name[idx]].values.reshape(-1, 1)
         SeqDat[Column_Name] = Expr_Scaler_n.fit_transform(myData)
         Scaler_Name = '{}_Scaler'.format(Y_Col_Name[idx])
@@ -554,7 +591,7 @@ def Entropy_on_Position(PSArray):
 ###########################################################################
 ###########################################################################
 
-def MyRFR(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', AddFeat=None):
+def MyRF(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', Response_Value=1, AddFeat=None):
     '''
     This function trains a random forest regressor and performs gradient search for optimal parameters with group shuffle shift.
     
@@ -563,15 +600,16 @@ def MyRFR(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', 
         Validation_cutoff: float; ratio of cross-validation train and test sets
         Num:               integer; number of validation splits performed
         Y_Col_Name:        string; name of expression strength column
+        Response_Value:    integer; decision how the original expression values where manipulated, 0: standardized, 1: original, >1: categorization
         AddFeat:           string; name of additional feature, typically GC-content
         
     Output:
         grid_forest:       function; regressor 
     '''
-    from sklearn.ensemble import RandomForestRegressor
+    from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
     from sklearn.model_selection import GroupShuffleSplit, GridSearchCV
     import numpy as np
-
+       
     Sequence_Samples, Sequence_Positions, Sequence_Bases = np.array(SeqOH['OneHot'].values.tolist()).shape
     X = np.array(SeqOH['OneHot'].values.tolist()).reshape(Sequence_Samples,Sequence_Positions*Sequence_Bases)
     # adding rows to x for additional features
@@ -589,7 +627,10 @@ def MyRFR(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', 
     # This is more realistic for parameter estimation
     cv = GroupShuffleSplit(n_splits=Num, test_size=Validation_cutoff, random_state=42)
 
-    forest_grid = RandomForestRegressor()
+    if Response_Value > 1:
+        forest_grid = RandomForestClassifier()
+    else:
+        forest_grid = RandomForestRegressor()
     grid_forest = GridSearchCV(forest_grid, param_grid, cv=cv, n_jobs=-1)
     grid_forest.fit(X, Y, groups)
            
@@ -598,7 +639,7 @@ def MyRFR(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', 
 ###########################################################################
 ###########################################################################
 
-def MyGBR(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', AddFeat=None):
+def MyGB(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', ML_Type='R', AddFeat=None):
     '''
     This function trains a gradient boosting regressor and performs gradient search for optimal parameters with group shuffle shift.
     
@@ -607,6 +648,7 @@ def MyGBR(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', 
         Validation_cutoff: float; ratio of cross-validation train and test sets
         Num:               integer; number of validation splits performed
         Y_Col_Name:        string; name of expression strength column
+        ML_Type:           string; decision whether to perform regression ('R') or classification ('C')
         AddFeat:           string; name of additional feature, typically GC-content
         
     Output:
@@ -633,16 +675,16 @@ def MyGBR(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', 
     # This is more realistic for parameter estimation
     cv = GroupShuffleSplit(n_splits=Num, test_size=Validation_cutoff, random_state=42)
 
-    GBR = GradientBoostingRegressor()
-    grid_GBR = GridSearchCV(GBR, param_grid, cv=cv, n_jobs=-1)
-    grid_GBR.fit(X, Y, groups)   
+    GB = GradientBoostingRegressor()
+    grid_GB = GridSearchCV(GB, param_grid, cv=cv, n_jobs=-1)
+    grid_GB.fit(X, Y, groups)   
     
     return grid_GBR
 
 ###########################################################################
 ###########################################################################
 
-def MySVR(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', AddFeat=None):
+def MySV(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', ML_Type='R', AddFeat=None):
     '''
     This function trains a support vector regressor and performs gradient search for optimal parameters with group shuffle shift.
     
@@ -651,6 +693,7 @@ def MySVR(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', 
         Validation_cutoff: float; ratio of cross-validation train and test sets
         Num:               integer; number of validation splits performed
         Y_Col_Name:        string; name of expression strength column
+        ML_Type:           string; decision whether to perform regression ('R') or classification ('C')
         AddFeat:           string; name of additional feature, typically GC-content
         
     Output:
@@ -1003,8 +1046,11 @@ def Predict_SequenceActivity(Sequence, Name_Dict):
     import pickle
 
     Measure_Numb = int(Name_Dict['Library_Expression'])
-    Data_Folder = Name_Dict['Data_Folder']
-    File_Base = Name_Dict['File_Base']
+    Data_File = Name_Dict['Data_File']
+    # extract the filename for naming of newly generated files
+    File_Base = Data_File.split('.')[0]
+    # the generated files will be stored in a subfolder with custom name
+    Data_Folder = 'data-{}'.format(File_Base)
     Y_Col_Name = eval(Name_Dict['Y_Col_Name'])
     ML_Date = Name_Dict['ML_Date']
     ML_Type = Name_Dict['ML_Regressor']
