@@ -159,8 +159,9 @@ def Data_Src_Load(Name_Dict):
         BinNum = Response_Value
         for Measurement in Y_Col_Name:
             CatName = '{}_ML'.format(Measurement)
-            SeqDat[CatName] = pd.qcut(SeqDat[Measurement], q=BinNum, labels=range(BinNum))
-        SeqDat.drop_duplicates('Sequence_letter-encrypted', inplace=True)    
+            SeqDat[CatName], bins = pd.qcut(SeqDat[Measurement], q=BinNum, labels=range(BinNum), retbins=True)
+        SeqDat.drop_duplicates('Sequence_letter-encrypted', inplace=True)   
+        print('The expression values were sorted into the following bins: {}'.format(bins))
         
     else:
         print('Response value parameter must be an positive integer number')
@@ -639,7 +640,7 @@ def MyRF(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', R
 ###########################################################################
 ###########################################################################
 
-def MyGB(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', ML_Type='R', AddFeat=None):
+def MyGB(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', Response_Value=1, AddFeat=None):
     '''
     This function trains a gradient boosting regressor and performs gradient search for optimal parameters with group shuffle shift.
     
@@ -648,13 +649,13 @@ def MyGB(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', M
         Validation_cutoff: float; ratio of cross-validation train and test sets
         Num:               integer; number of validation splits performed
         Y_Col_Name:        string; name of expression strength column
-        ML_Type:           string; decision whether to perform regression ('R') or classification ('C')
+        Response_Value:    integer; decision how the original expression values where manipulated, 0: standardized, 1: original, >1: categorization
         AddFeat:           string; name of additional feature, typically GC-content
         
     Output:
         grid_GBR:       function; regressor 
     '''
-    from sklearn.ensemble import GradientBoostingRegressor
+    from sklearn.ensemble import GradientBoostingRegressor, GradientBoostingClassifier
     from sklearn.model_selection import GroupShuffleSplit, GridSearchCV
     import numpy as np
 
@@ -666,25 +667,28 @@ def MyGB(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', M
     Y = SeqOH[Y_Col_Name].values
 
     groups = SeqOH['Sequence_letter-encrypted']
-    Number_Estimators = np.arange(20,40,2)
-    Max_Features = np.arange(10,30,2)
+    Number_Estimators = np.arange(20,40,3)
+    Max_Features = np.arange(10,30,3)
     min_samples_split = np.arange(2,4,1)
-    learning_rate = np.logspace(-3,2,10)
+    learning_rate = np.logspace(-3,2,5)
     param_grid = [{'n_estimators': Number_Estimators, 'max_features': Max_Features, 'min_samples_split': min_samples_split, 'learning_rate': learning_rate}]
     # Group shuffle split removes groups with identical sequences from the development set
     # This is more realistic for parameter estimation
     cv = GroupShuffleSplit(n_splits=Num, test_size=Validation_cutoff, random_state=42)
 
-    GB = GradientBoostingRegressor()
+    if Response_Value > 1:
+        GB = GradientBoostingClassifier()
+    else:
+        GB = GradientBoostingRegressor()
     grid_GB = GridSearchCV(GB, param_grid, cv=cv, n_jobs=-1)
     grid_GB.fit(X, Y, groups)   
     
-    return grid_GBR
+    return grid_GB
 
 ###########################################################################
 ###########################################################################
 
-def MySV(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', ML_Type='R', AddFeat=None):
+def MySV(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', Response_Value=1, AddFeat=None):
     '''
     This function trains a support vector regressor and performs gradient search for optimal parameters with group shuffle shift.
     
@@ -693,7 +697,7 @@ def MySV(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', M
         Validation_cutoff: float; ratio of cross-validation train and test sets
         Num:               integer; number of validation splits performed
         Y_Col_Name:        string; name of expression strength column
-        ML_Type:           string; decision whether to perform regression ('R') or classification ('C')
+        Response_Value:    integer; decision how the original expression values where manipulated, 0: standardized, 1: original, >1: categorization
         AddFeat:           string; name of additional feature, typically GC-content
         
     Output:
@@ -718,11 +722,14 @@ def MySV(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', M
     # This is more realistic for parameter estimation
     cv = GroupShuffleSplit(n_splits=Num, test_size=Validation_cutoff, random_state=42)
 
-    SVR = svm.SVR()
-    grid_SVR = GridSearchCV(SVR, param_grid, cv=cv, n_jobs=-1)
-    grid_SVR.fit(X, Y, groups)     
+    if Response_Value > 1:
+        SV = svm.SVC()
+    else:
+        SV = svm.SVR()
+    grid_SV = GridSearchCV(SV, param_grid, cv=cv, n_jobs=-1)
+    grid_SV.fit(X, Y, groups)     
     
-    return grid_SVR
+    return grid_SV
 
 ###########################################################################
 ###########################################################################
