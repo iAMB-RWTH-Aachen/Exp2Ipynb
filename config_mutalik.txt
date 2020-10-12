@@ -4,7 +4,8 @@ Data_File: mutalik12_Ecol.csv
 Sequence_column: Short sequences
 Y_Col_Name: ['sE oexp']
 ID_Col_Name: Promoter
-Revome_Outlier: False
+Response_Value: 3
+Remove_Outlier: True
 Stats2Samples: False
 Stats_Std: ['Error']
 Stats_Samples: ['Samples']

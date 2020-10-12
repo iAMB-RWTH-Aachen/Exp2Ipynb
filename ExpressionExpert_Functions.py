@@ -95,8 +95,8 @@ def Data_Src_Load(Name_Dict):
     ML_Regressor = Name_Dict['ML_Regressor']
     Response_Value = eval(Name_Dict['Response_Value'])
     
-    if 'Revome_Outlier' in Name_Dict:
-        Remove_Outlier = eval(Name_Dict['Revome_Outlier'])
+    if 'Remove_Outlier' in Name_Dict:
+        Remove_Outlier = eval(Name_Dict['Remove_Outlier'])
     else:
         Remove_Outlier = False
 

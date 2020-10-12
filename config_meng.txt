@@ -3,6 +3,8 @@ Data_File: meng.csv
 Sequence_column: Sequence
 Y_Col_Name: ['Activity']
 ID_Col_Name: Sequence-ID
+Response_Value: 3
+Remove_Outlier: True
 Stats2Samples: False
 Stats_Std: None
 Stats_Samples: None

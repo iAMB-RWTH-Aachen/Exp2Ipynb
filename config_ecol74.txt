@@ -3,6 +3,8 @@ Data_File: dengyu_Ecol_74.csv
 Sequence_column: Sequence
 Y_Col_Name: ['Activity']
 ID_Col_Name: Name
+Response_Value: 1
+Remove_Outlier: False
 Stats2Samples: False
 Stats_Std: ['Error']
 Stats_Samples: ['Samples']
