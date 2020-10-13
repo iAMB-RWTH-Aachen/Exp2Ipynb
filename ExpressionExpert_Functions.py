@@ -1109,3 +1109,14 @@ def Predict_SequenceActivity(Sequence, Name_Dict):
         return
     
     return np.round(Activity,3)
+
+def largest_indices(ary, n):
+    """Returns the n largest indices from a numpy array.
+    
+        Source: https://stackoverflow.com/questions/6910641/how-do-i-get-indices-of-n-maximum-values-in-a-numpy-array
+    """
+    import numpy as np
+    flat = ary.flatten()
+    indices = np.argpartition(flat, -n)[-n:]
+    indices = indices[np.argsort(-flat[indices])]
+    return np.unravel_index(indices, ary.shape)
