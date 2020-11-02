@@ -241,7 +241,7 @@ def ExpressionScaler(SeqDat, Name_Dict):
         Column_Name = '{}_ML'.format(Y_Col_Name[idx])
         myData = SeqDat[Y_Col_Name[idx]].values.reshape(-1, 1)
         SeqDat[Column_Name] = Expr_Scaler_n.fit_transform(myData)
-        Scaler_Name = '{}_Scaler'.format(Y_Col_Name[idx])
+        Scaler_Name = '{}_Scaler'.format(Column_Name)
         Expr_Scaler[Scaler_Name] = copy.deepcopy(Expr_Scaler_n)
      
     return SeqDat, Expr_Scaler
