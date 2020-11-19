@@ -1,11 +1,11 @@
 # This file contains the naming conventions for all output files. It is automatically generated when going through step "0-Workflow".
-Data_File: Geobacillus_Love.csv
+Data_File: gilman.csv
 Sequence_column: DNA Sequence
 Y_Col_Name: ['GFP mean', 'mOrange mean']
 ID_Col_Name: Promoter number
 Response_Value: 3
 Remove_Outlier: False
-Stats2Samples: True
+Stats2Samples: False
 Stats_Std: ['GFP StDev', 'mOrange StDev']
 Stats_Samples: ['GFP N', 'mOrange N']
 Library_Expression: 2
@@ -21,13 +21,13 @@ CorrPlot_File: Plot_Corr-Ytrue-VS-Ypred
 Csv_ID: Synth-Library
 X_Expr: Plot_CrossExpr
 RefSeq: 
-ML_Regressor: RFR
-Data_Standard: True
+ML_Regressor: RFC
+# Data_Standard: True
 SynLib_Date: 00000000
-ML_Date: 20201012
+ML_Date: 20201119
 TestRatio: 0.1
 Expression_Unit: relative-strength
-Sequence_Distance_cutoff: 0.11
+Sequence_Distance_cutoff: 0.9
 Entropy_cutoff: 1
 Synth_Seq_MaxNumber: 10000
 Figure_Font_Size: 18

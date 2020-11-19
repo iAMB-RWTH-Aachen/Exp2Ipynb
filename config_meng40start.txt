@@ -1,0 +1,33 @@
+# This file contains the naming conventions for all output files. It is automatically generated when going through step "0-Workflow".
+Data_File: meng40start.csv
+Sequence_column: first40
+Y_Col_Name: ['Activity']
+ID_Col_Name: Sequence-ID
+Response_Value: 3
+Remove_Outlier: True
+Stats2Samples: False
+Stats_Std: None
+Stats_Samples: None
+Library_Expression: 1
+Add_Feat: ['GC-content']
+Figure_Type: png
+HM_File: Plot_PositionNucleotideStats
+SampSeqDist_File: Plot_SampleSequenceDistance
+Entropy_File: Plot_PositionEntropy
+SamplingDiv_File: Plot_SamplingDiversity
+ExprHist_File: Plot_ExpressionHist
+LogoPlot_File: Plot_Logo-FI
+CorrPlot_File: Plot_Corr-Ytrue-VS-Ypred
+Csv_ID: Synth-Library
+X_Expr: Plot_CrossExpr
+RefSeq: 
+ML_Regressor: RFR
+Data_Standard: False
+SynLib_Date: 20200615
+ML_Date: 20201119
+TestRatio: 0.1
+Expression_Unit: relative-strength
+Sequence_Distance_cutoff: 0.11
+Entropy_cutoff: 0.2
+Synth_Seq_MaxNumber: 10000
+Figure_Font_Size: 18
