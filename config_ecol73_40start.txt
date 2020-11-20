@@ -1,11 +1,11 @@
 # This file contains the naming conventions for all output files. It is automatically generated when going through step "0-Workflow".
-Data_File: dengyu_Ecol_73.csv
+Data_File: dengyu_Ecol_73_40start.csv
 Sequence_column: Sequence
 Y_Col_Name: ['Activity']
 ID_Col_Name: Name
-Response_Value: 1
+Response_Value: 3
 Remove_Outlier: True
-Stats2Samples: True
+Stats2Samples: False
 Stats_Std: ['Error']
 Stats_Samples: ['Samples']
 Library_Expression: 1
