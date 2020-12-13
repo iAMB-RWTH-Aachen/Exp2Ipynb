@@ -16,7 +16,7 @@ The analysis is distributed in different notebooks:
 | 5-Promoter-Prediction | Activity prediction of defined sequences. The activity of single sequences can be assessed as well as to identify sequences with defined activity. |
 
 
-Last Version: 2020/07/01<br>
+Last Version: 2020/12/13<br>
 Author: Ulf Liebal<br>
 Contact: ulf.liebal@rwth-aachen.de<br>
 License: see LICENSE file<br>
