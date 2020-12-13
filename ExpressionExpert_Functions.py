@@ -669,9 +669,10 @@ def MyGB(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', R
     groups = SeqOH['Sequence_letter-encrypted']
     Number_Estimators = np.arange(20,40,3)
     Max_Features = np.arange(10,30,3)
-    min_samples_split = np.arange(2,4,1)
-    learning_rate = np.logspace(-3,2,5)
-    param_grid = [{'n_estimators': Number_Estimators, 'max_features': Max_Features, 'min_samples_split': min_samples_split, 'learning_rate': learning_rate}]
+    min_samples_split = np.arange(3,4,1)
+    learning_rate = np.logspace(-3,2,10)
+    min_samples_leaf = np.array([3])
+    param_grid = [{'n_estimators': Number_Estimators, 'max_features': Max_Features, 'min_samples_split': min_samples_split, 'min_samples_leaf':min_samples_leaf, 'learning_rate': learning_rate}]
     # Group shuffle split removes groups with identical sequences from the development set
     # This is more realistic for parameter estimation
     cv = GroupShuffleSplit(n_splits=Num, test_size=Validation_cutoff, random_state=42)
