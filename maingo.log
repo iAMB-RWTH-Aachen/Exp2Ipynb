@@ -1,0 +1,284 @@
+
+************************************************************************************************************************
+*                                                                                                                      *
+*                                             You are using MAiNGO v0.3.0                                              *
+*                                                                                                                      *
+*  Please cite the latest MAiNGO report from http://permalink.avt.rwth-aachen.de/?id=729717 :                          *
+*  Bongartz, D., Najman, J., Sass, S. and Mitsos, A., MAiNGO - McCormick-based Algorithm for mixed-integer Nonlinear   *
+*  Global Optimization. Technical Report, Process Systems Engineering (AVT.SVT), RWTH Aachen University (2018).        *
+*                                                                                                                      *
+************************************************************************************************************************
+  Settings set by the user:
+    maxTime 360
+    PRE_maxLocalSearches 50
+    Could not find setting outstreamVerbosity. Proceeding.
+    Could not find setting outstreamVerbosity. Proceeding.
+    Could not find setting outstreamVerbosity. Proceeding.
+  Done.
+
+  Pre-processing at root node:
+    Initialize subsolvers...
+      Multistart: IPOPT
+      Upper bounding: SLSQP
+      Lower bounding: CLP
+    Warning: bounds of integer variable x_0 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_1 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_2 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_3 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_4 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_5 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_6 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_7 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_8 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_9 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_10 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_11 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_12 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_13 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_14 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_15 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_16 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_17 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_18 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_19 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_20 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_21 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_22 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_23 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_24 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_25 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_26 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_27 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_28 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_29 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_30 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_31 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_32 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_33 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_34 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_35 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_36 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_37 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_38 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_39 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_40 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_41 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_42 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_43 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_44 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_45 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_46 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_47 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_48 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_49 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_50 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_51 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_52 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_53 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_54 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_55 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_56 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_57 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_58 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_59 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_60 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_61 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_62 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_63 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_64 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_65 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_66 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_67 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_68 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_69 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_70 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_71 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_72 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_73 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_74 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_75 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_76 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_77 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_78 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_79 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_80 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_81 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_82 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_83 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_84 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_85 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_86 are changed from user input [nan, nan] to [0, 1].
+    Warning: bounds of integer variable x_87 are changed from user input [nan, nan] to [0, 1].
+    Constraint propagation...
+    Optimization-based bound tightening (feasibility only)...
+    Multistart local searches...
+      No feasible point found.
+    CPU time: 15.2599 s.
+  Done.
+
+  Entering branch-and-bound loop:
+  Iteration        LBD              UBD        NodesLeft        AbsGap           RelGap            CPU       
+          1     0.000000e+00     6.904659e-02          2     6.904659e-02     1.000000e+00     1.536197e+01  
+        100     0.000000e+00     6.769601e-02        101     6.769601e-02     1.000000e+00     2.564534e+01  
+        200     0.000000e+00     6.769601e-02        201     6.769601e-02     1.000000e+00     3.580708e+01  
+        300     0.000000e+00     6.769601e-02        301     6.769601e-02     1.000000e+00     4.590747e+01  
+        400     0.000000e+00     6.758989e-02        401     6.758989e-02     1.000000e+00     5.592957e+01  
+        500     0.000000e+00     6.758989e-02        501     6.758989e-02     1.000000e+00     6.587847e+01  
+        600     0.000000e+00     6.714185e-02        601     6.714185e-02     1.000000e+00     7.585650e+01  
+        700     0.000000e+00     6.714185e-02        701     6.714185e-02     1.000000e+00     8.608289e+01  
+        800     0.000000e+00     6.714185e-02        801     6.714185e-02     1.000000e+00     9.611863e+01  
+        900     0.000000e+00     6.714185e-02        901     6.714185e-02     1.000000e+00     1.060635e+02  
+       1000     0.000000e+00     6.714185e-02       1001     6.714185e-02     1.000000e+00     1.161581e+02  
+       1100     0.000000e+00     6.714185e-02       1101     6.714185e-02     1.000000e+00     1.261420e+02  
+       1200     0.000000e+00     6.714185e-02       1201     6.714185e-02     1.000000e+00     1.362573e+02  
+       1300     0.000000e+00     6.640399e-02       1301     6.640399e-02     1.000000e+00     1.462245e+02  
+       1400     0.000000e+00     6.640399e-02       1401     6.640399e-02     1.000000e+00     1.560077e+02  
+       1500     0.000000e+00     6.640399e-02       1501     6.640399e-02     1.000000e+00     1.659263e+02  
+       1600     0.000000e+00     6.640399e-02       1601     6.640399e-02     1.000000e+00     1.757101e+02  
+       1700     0.000000e+00     6.640399e-02       1701     6.640399e-02     1.000000e+00     1.854610e+02  
+       1800     0.000000e+00     6.636909e-02       1801     6.636909e-02     1.000000e+00     1.953615e+02  
+       1900     0.000000e+00     6.620542e-02       1901     6.620542e-02     1.000000e+00     2.052379e+02  
+  Iteration        LBD              UBD        NodesLeft        AbsGap           RelGap            CPU       
+       2000     0.000000e+00     6.620542e-02       2001     6.620542e-02     1.000000e+00     2.151809e+02  
+       2100     0.000000e+00     6.620542e-02       2101     6.620542e-02     1.000000e+00     2.251660e+02  
+       2200     0.000000e+00     6.620542e-02       2201     6.620542e-02     1.000000e+00     2.351495e+02  
+       2300     0.000000e+00     6.620542e-02       2301     6.620542e-02     1.000000e+00     2.452570e+02  
+       2400     0.000000e+00     6.620542e-02       2401     6.620542e-02     1.000000e+00     2.554724e+02  
+       2500     0.000000e+00     6.620542e-02       2501     6.620542e-02     1.000000e+00     2.655539e+02  
+       2600     0.000000e+00     6.620542e-02       2601     6.620542e-02     1.000000e+00     2.755278e+02  
+       2700     0.000000e+00     6.620542e-02       2701     6.620542e-02     1.000000e+00     2.854421e+02  
+       2800     0.000000e+00     6.620542e-02       2801     6.620542e-02     1.000000e+00     2.956102e+02  
+       2900     0.000000e+00     6.620542e-02       2901     6.620542e-02     1.000000e+00     3.056132e+02  
+       3000     0.000000e+00     6.620542e-02       3001     6.620542e-02     1.000000e+00     3.156478e+02  
+       3100     0.000000e+00     6.620542e-02       3101     6.620542e-02     1.000000e+00     3.256853e+02  
+       3200     0.000000e+00     6.620542e-02       3201     6.620542e-02     1.000000e+00     3.356093e+02  
+       3300     0.000000e+00     6.620542e-02       3301     6.620542e-02     1.000000e+00     3.456880e+02  
+       3400     0.000000e+00     6.620542e-02       3401     6.620542e-02     1.000000e+00     3.558094e+02  
+       3442     0.000000e+00     6.620542e-02       3443     6.620542e-02     1.000000e+00     3.600477e+02  
+
+************************************************************************************************************************
+*                                                                                                                      *
+*                                              *** Reached CPU time limit! ***                                             *
+*                                                                                                                      *
+************************************************************************************************************************
+
+  Problem statistics: 
+    Variables                                = 88
+      Thereof binary                         = 88
+    Inequality constraints                   = 0
+    Equality constraints                     = 22
+
+  Solution statistics: 
+    Total UBD problems solved         = 3442
+    Total LBD problems solved         = 3442
+    Total number of iterations        = 3442
+    Maximum number of nodes in memory = 3443
+    Best solution first found at iteration 1802
+
+===================================================================
+
+  Final LBD          = 0
+  Final absolute gap = 0.06620542120777601
+  Final relative gap = 1
+  Objective value = 0.06620542120777601
+  Solution point:
+     x_0 =                    0
+     x_1 =                    1
+     x_2 =                    0
+     x_3 =                    0
+     x_4 =                    1
+     x_5 =                    0
+     x_6 =                    0
+     x_7 =                    0
+     x_8 =                    0
+     x_9 =                    0
+    x_10 =                    0
+    x_11 =                    1
+    x_12 =                    0
+    x_13 =                    0
+    x_14 =                    0
+    x_15 =                    1
+    x_16 =                    0
+    x_17 =                    0
+    x_18 =                    0
+    x_19 =                    1
+    x_20 =                    0
+    x_21 =                    1
+    x_22 =                    0
+    x_23 =                    0
+    x_24 =                    0
+    x_25 =                    0
+    x_26 =                    0
+    x_27 =                    1
+    x_28 =                    0
+    x_29 =                    0
+    x_30 =                    0
+    x_31 =                    1
+    x_32 =                    0
+    x_33 =                    1
+    x_34 =                    0
+    x_35 =                    0
+    x_36 =                    0
+    x_37 =                    0
+    x_38 =                    0
+    x_39 =                    1
+    x_40 =                    0
+    x_41 =                    0
+    x_42 =                    1
+    x_43 =                    0
+    x_44 =                    0
+    x_45 =                    0
+    x_46 =                    0
+    x_47 =                    1
+    x_48 =                    0
+    x_49 =                    0
+    x_50 =                    0
+    x_51 =                    1
+    x_52 =                    0
+    x_53 =                    0
+    x_54 =                    0
+    x_55 =                    1
+    x_56 =                    0
+    x_57 =                    0
+    x_58 =                    0
+    x_59 =                    1
+    x_60 =                    0
+    x_61 =                    0
+    x_62 =                    1
+    x_63 =                    0
+    x_64 =                    1
+    x_65 =                    0
+    x_66 =                    0
+    x_67 =                    0
+    x_68 =                    0
+    x_69 =                    0
+    x_70 =                    1
+    x_71 =                    0
+    x_72 =                    0
+    x_73 =                    0
+    x_74 =                    1
+    x_75 =                    0
+    x_76 =                    0
+    x_77 =                    0
+    x_78 =                    0
+    x_79 =                    1
+    x_80 =                    1
+    x_81 =                    0
+    x_82 =                    0
+    x_83 =                    0
+    x_84 =                    1
+    x_85 =                    0
+    x_86 =                    0
+    x_87 =                    0
+
+===================================================================
+
+  Additional Model outputs: 
+    obj  = 0.04269587047004596
+
+===================================================================
+
+  CPU time:        360.081 seconds (Preprocessing + B&B).
+                   This equals 6m 0.081s (CPU).
+  Wall-clock time: 360.671 seconds (Preprocessing + B&B).
+                   This equals 6m 0.671s (wall clock).
