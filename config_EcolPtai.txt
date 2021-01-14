@@ -3,7 +3,7 @@ Data_File: PromLib_EcolPtai.csv
 Sequence_column: Sequence
 Y_Col_Name: ['Ecol Promoter Activity', 'Ptai Promoter Activity']
 ID_Col_Name: Strain ID Ecol
-Response_Value: 1
+Response_Value: 0
 Remove_Outlier: False
 Stats2Samples: False
 Stats_Std:

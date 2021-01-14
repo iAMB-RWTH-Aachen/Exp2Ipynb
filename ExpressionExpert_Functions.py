@@ -858,7 +858,7 @@ def ExpressionVariation_HeatMap(SeqList, Y_Col_Name = 'promoter activity'):
 
 def ExpressionMean_ttest(a_np, b_np, OH_List):
     '''
-    Calculating whether the mean expression values are significantly different.
+    Calculating whether the mean expression values are significantly different. The Welsh's t-test is used for populations with unequal mean and variance.
     Input:
         a_np:       np vector, contains the measurements of cross host/reporter
         b_np:       np vector, contains the measurements of cross host/reporter
@@ -881,7 +881,7 @@ def ExpressionMean_ttest(a_np, b_np, OH_List):
     b_matr = np.multiply(Seq_OneHot_ar, Expr_mult_b)
 
     # performing the students t-test
-    stat, p = ttest_ind(a_matr, b_matr, axis=0)
+    stat, p = ttest_ind(a_matr, b_matr, axis=0, equal_var=False)
     # identifying significant differences in the mean values
     MeanSignDiff = np.multiply(p<=.05,1).reshape(-1,4)
     Expression_ttest = pd.DataFrame(MeanSignDiff, columns=['A','C','G','T'])
