@@ -618,11 +618,11 @@ def MyRF(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', R
         X = np.append(X,np.array(SeqOH[AddFeat]), axis=1)
     Y = SeqOH[Y_Col_Name].values
     groups = SeqOH['Sequence_letter-encrypted']
-    Number_Estimators = np.arange(20,40,2)
-    Max_Features = np.arange(10,30,2)
-    min_samples_split = np.arange(3,4,1)
-    max_depth = np.arange(3,5)
-    min_samples_leaf = np.array([2])
+    Number_Estimators = np.array([40])   # overfit parameter: 40
+    Max_Features = np.arange(10,30,2)     # overfit parameter: 15
+    min_samples_split = np.arange(3,4,1) # overfit parameter: 3
+    max_depth = np.arange(2,10,4)        # overfit parameter: 35
+    min_samples_leaf = np.array([3])     # overfit parameter: 2
     param_grid = [{'bootstrap':[False], 'n_estimators': Number_Estimators, 'max_features': Max_Features, 'min_samples_split': min_samples_split, 'max_depth':max_depth, 'min_samples_leaf':min_samples_leaf}]
     # Group shuffle split removes groups with identical sequences from the development set
     # This is more realistic for parameter estimation
@@ -667,7 +667,7 @@ def MyGB(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', R
     Y = SeqOH[Y_Col_Name].values
 
     groups = SeqOH['Sequence_letter-encrypted']
-    Number_Estimators = np.arange(20,40,3)
+    Number_Estimators = np.array([40])
     Max_Features = np.arange(10,30,3)
     min_samples_split = np.arange(3,4,1)
     learning_rate = np.logspace(-3,2,10)
@@ -1121,3 +1121,174 @@ def largest_indices(ary, n):
     indices = np.argpartition(flat, -n)[-n:]
     indices = indices[np.argsort(-flat[indices])]
     return np.unravel_index(indices, ary.shape)
+
+
+#####################################################
+#####################################################
+#
+# Functions for optimization
+#
+#####################################################
+#####################################################
+
+# Convert categorical encoding to letter encoding
+def toLetter(myList):
+    Letters = {0:'A', 1:'C', 2:'G',3:'T'}
+    myLet = [Letters.get(x,x) for x in myList]
+    
+    return myLet
+
+def toCat(myLetters):
+    Cats = {'A':0, 'C':1, 'G':2, 'T':3}
+    myCats = [Cats.get(x,x) for x in myLetters]
+    
+    return myCats
+
+# Convert the integer encoding of the nukleotides used by the GA into a one-hot encoding
+def decode(individual):
+    gene = list()
+    for i in individual:
+        if i == 0:
+            gene += [1, 0, 0, 0]
+        elif i == 1:
+            gene += [0, 1, 0, 0]
+        elif i == 2:
+            gene += [0, 0, 1, 0]
+        elif i == 3:
+            gene += [0, 0, 0, 1]
+            
+    return gene
+
+
+def evaluation(individual):
+    gene = decode(individual)
+    
+    # Calculate the gc share and append it to the input
+    gc_share =0
+    for i in range(0,nNukleotides,4):
+        gc_share += gene[i+1] + gene[i+2]
+
+    gc_share /= nNukleotides
+    
+    regressor_input = gene + [gc_share]
+    
+    expression = myRegr.predict([regressor_input])
+    
+    return expression[0]
+
+def feasible(individual):
+    ######## Check if individual is already known ########
+    if tuple(individual) in myRefSeqs:
+        return False
+    
+    
+    ######## Check if individual has high expression ########
+    gene = decode(individual)
+
+    expression = evaluation(individual)
+
+    if expression != 1:
+        return False
+    
+    return True
+
+def distance(individual, RefSeqs):
+    RefNum = np.array(RefSeqs, ndmin=2).shape[0]
+    d = np.sum(np.not_equal([individual]*RefNum, RefSeqs))    
+    return (d,)
+
+def SequenceSinglePredFull(SeqPred, RefFull, Positions_removed):
+    '''
+    The optimization results in a sequence list for positions that were used as features in the prediction. Thus, additional sequence elements have to be added that where removed because of insufficient diversity.
+    '''
+    # Extracting feature positions from RefFull, i.e. deleting with Positions_removed
+    RefNum = len(RefFull)
+    RefFull_ar = np.reshape(np.array([Let for Seq in np.array(RefFull) for Let in Seq]),(RefNum,-1))
+    SeqRef = np.delete(RefFull_ar,Positions_removed, axis=1)
+    
+    # converting sequences to categorical
+    CatPred = toCat(SeqPred)
+    CatRef = [toCat(XRef) for XRef in SeqRef]
+    # Take the sequence closest to the predicted one.
+    myDist = [distance(CatPred, XRef) for XRef in CatRef]
+    
+    # The positions will be copied from the closest reference sequence to the predicted sequence.
+    PredSeqTemp = np.array([Letter for Letter in RefFull[np.argmin(myDist)]])
+    
+    # Position_removed contains the indices of positions that were not used for activity prediction.     
+    Pos_Test = np.delete(np.reshape(np.arange(0,RefFull_ar.shape[1]),(-1,1)), myParams['Positions_removed'])
+
+    # Replacing the predicted sequence into the reference sequence
+    PredSeqTemp[Pos_Test] = [Letter for Letter in SeqPred]
+    PredSeq = ''.join(PredSeqTemp)
+
+    return PredSeq
+
+def make_GAtoolbox(nPositions, myRefSeqs, npop=1000, ngen=30):
+    '''
+    The function generates a 'toolobox' and 'stats' variable that is used in the GA optimization. It contains the optimization function, and additional functions to characterize the solution space.
+    '''
+    import random
+    import numpy as np
+    from deap import base, creator, tools, algorithms
+    from ExpressionExpert_Functions import distance
+    
+    toolbox = base.Toolbox()
+
+    ###################### Define individuals and poopulation ##########################
+
+    # Define type of fitness function (weight=-1 => minimization)
+    creator.create("FitnessMax", base.Fitness, weights=(-1.0,))
+
+    # Define container that represents individual (individual is a list and has the defined fitness)
+    creator.create("Individual", list, fitness=creator.FitnessMax)
+
+    # Define how individual is created (individual object is filled with nPosition random integers that represent the
+    # nukleotides)
+    toolbox.register("attr_int", random.randint, 0, 3)
+    toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_int, nPositions)
+
+    # Define how population is created (population is a list of individuals)
+    toolbox.register("population", tools.initRepeat, list, toolbox.individual)
+
+    ###################### Set fucntions for GA steps ##########################
+
+    # Set selection function (selTournament: randomly select tournsize individuals and select the best one as parent)
+    # The selection function is later repeated n times in each generation to generate n parents 
+    toolbox.register("select", tools.selTournament, tournsize=3)
+
+    # Set mating function ( cxUniform: takes two parents and transforms them into two childs by iterating over the
+    # positions and swapping the nukleotides between the parents with a probability of indpb at each position)
+    toolbox.register("mate", tools.cxUniform, indpb=0.5)
+
+    # Set mutation function (mutUniformInt: mutate a child by iterating over its positions and assigning a new
+    # nukleotide with probability indpb)
+    toolbox.register("mutate", tools.mutUniformInt, low=0, up=3, indpb=0.1)
+
+    # Set fitness function
+    toolbox.register("evaluate", distance, RefSeqs=myRefSeqs)
+    # Add constraint handling ()
+    toolbox.decorate("evaluate", tools.DeltaPenalty(feasible, 1000.0))
+
+    ###################### Define statistics to be evaluated at each generation ##########################
+    stats = tools.Statistics(lambda ind: ind.fitness.values)
+    stats.register("avg", np.mean)
+    stats.register("std", np.std)
+    stats.register("min", np.min)
+    stats.register("max", np.max)
+    
+    # Create initial population
+    pop = toolbox.population(n=npop)
+
+    # Create hall of fame object that keeps track of the best individual
+    hof = tools.HallOfFame(5)
+
+    # Perform GA
+    # cxpb: probability that two parents mate (if they do they are discared and their child kept, otherwise they 
+    #       are kept)
+    # mutpb: probability that a child is mutated
+    # ngen: number of generations(=iterations)
+    pop, log = algorithms.eaSimple(pop, toolbox, cxpb=0.5, mutpb=0.5, ngen=ngen, 
+                                   stats=stats, halloffame=hof, verbose=True)
+    
+    return hof, toolbox, stats

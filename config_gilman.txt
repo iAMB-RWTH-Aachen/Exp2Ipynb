@@ -3,7 +3,7 @@ Data_File: gilman.csv
 Sequence_column: DNA Sequence
 Y_Col_Name: ['GFP mean', 'mOrange mean']
 ID_Col_Name: Promoter number
-Response_Value: 3
+Response_Value: 1
 Remove_Outlier: False
 Stats2Samples: False
 Stats_Std: ['GFP StDev', 'mOrange StDev']
@@ -21,10 +21,10 @@ CorrPlot_File: Plot_Corr-Ytrue-VS-Ypred
 Csv_ID: Synth-Library
 X_Expr: Plot_CrossExpr
 RefSeq: 
-ML_Regressor: RFC
-# Data_Standard: True
+ML_Regressor: RFR
+# Data_Standard: False
 SynLib_Date: 00000000
-ML_Date: 20201119
+ML_Date: 20210120
 TestRatio: 0.1
 Expression_Unit: relative-strength
 Sequence_Distance_cutoff: 0.9

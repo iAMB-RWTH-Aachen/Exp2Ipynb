@@ -3,7 +3,7 @@ Data_File: liu_bacillus.csv
 Sequence_column: Sequence(5-3)
 Y_Col_Name: ['GFP relative activity']
 ID_Col_Name: Promoter
-Response_Value: 3
+Response_Value: 1
 Remove_Outlier: True
 Stats2Samples: True
 Stats_Std: ['Sd']
@@ -22,9 +22,9 @@ Csv_ID: Synth-Library
 X_Expr: Plot_CrossExpr
 RefSeq: 
 ML_Regressor: RFR
-Data_Standard: False
+#Data_Standard: False
 SynLib_Date: 20200615
-ML_Date: 20201012
+ML_Date: 00000000
 TestRatio: 0.1
 Expression_Unit: Relative activity
 Sequence_Distance_cutoff: 0.11
