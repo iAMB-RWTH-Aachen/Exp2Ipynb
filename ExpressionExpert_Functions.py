@@ -12,6 +12,8 @@ Date: 2020, May
 #
 ###########################################################################
 ###########################################################################
+import warnings
+
 
 def init_Exp2(config_File):
     '''
@@ -167,6 +169,8 @@ def Data_Src_Load(Name_Dict):
         print('Response value parameter must be an positive integer number')
     SeqDat.reset_index(inplace=True)
     
+    #categorical encoding of whole sequence
+#     SeqDat['Sequence-Categorical'] = SeqOH['Sequence_letter-encrypted'].astype('category').cat.codes
 
     return SeqDat
 
@@ -610,7 +614,8 @@ def MyRF(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', R
     from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
     from sklearn.model_selection import GroupShuffleSplit, GridSearchCV
     import numpy as np
-       
+    from joblib import parallel_backend
+      
     Sequence_Samples, Sequence_Positions, Sequence_Bases = np.array(SeqOH['OneHot'].values.tolist()).shape
     X = np.array(SeqOH['OneHot'].values.tolist()).reshape(Sequence_Samples,Sequence_Positions*Sequence_Bases)
     # adding rows to x for additional features
@@ -632,8 +637,15 @@ def MyRF(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', R
         forest_grid = RandomForestClassifier()
     else:
         forest_grid = RandomForestRegressor()
-    grid_forest = GridSearchCV(forest_grid, param_grid, cv=cv, n_jobs=-1)
-    grid_forest.fit(X, Y, groups)
+    grid_forest = GridSearchCV(forest_grid, param_grid, cv=cv)
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=FutureWarning)
+        # execute code that will generate warnings
+        # in some cases, parallel jobs given via GridSearchCV 'n_jobs' generates an error:
+        # https://github.com/scikit-learn-contrib/skope-rules/issues/18
+
+        with parallel_backend('threading', n_jobs=-1):
+            grid_forest.fit(X, Y, groups) # with groups
            
     return grid_forest
 
@@ -658,6 +670,7 @@ def MyGB(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', R
     from sklearn.ensemble import GradientBoostingRegressor, GradientBoostingClassifier
     from sklearn.model_selection import GroupShuffleSplit, GridSearchCV
     import numpy as np
+    from joblib import parallel_backend
 
     Sequence_Samples, Sequence_Positions, Sequence_Bases = np.array(SeqOH['OneHot'].values.tolist()).shape
     X = np.array(SeqOH['OneHot'].values.tolist()).reshape(Sequence_Samples,Sequence_Positions*Sequence_Bases)
@@ -681,8 +694,14 @@ def MyGB(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', R
         GB = GradientBoostingClassifier()
     else:
         GB = GradientBoostingRegressor()
-    grid_GB = GridSearchCV(GB, param_grid, cv=cv, n_jobs=-1)
-    grid_GB.fit(X, Y, groups)   
+    grid_GB = GridSearchCV(GB, param_grid, cv=cv)
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=FutureWarning)
+        # execute code that will generate warnings
+        # in some cases, parallel jobs given via GridSearchCV 'n_jobs' generates an error:
+        # https://github.com/scikit-learn-contrib/skope-rules/issues/18
+        with parallel_backend('threading', n_jobs=-1):
+            grid_GB.fit(X, Y, groups)   
     
     return grid_GB
 
@@ -707,6 +726,7 @@ def MySV(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', R
     from sklearn import svm
     from sklearn.model_selection import GroupShuffleSplit, GridSearchCV
     import numpy as np
+    from joblib import parallel_backend
 
     Sequence_Samples, Sequence_Positions, Sequence_Bases = np.array(SeqOH['OneHot'].values.tolist()).shape
     X = np.array(SeqOH['OneHot'].values.tolist()).reshape(Sequence_Samples,Sequence_Positions*Sequence_Bases)
@@ -727,8 +747,14 @@ def MySV(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', R
         SV = svm.SVC()
     else:
         SV = svm.SVR()
-    grid_SV = GridSearchCV(SV, param_grid, cv=cv, n_jobs=-1)
-    grid_SV.fit(X, Y, groups)     
+    grid_SV = GridSearchCV(SV, param_grid, cv=cv)
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=FutureWarning)
+        # execute code that will generate warnings
+        # in some cases, parallel jobs given via GridSearchCV 'n_jobs' generates an error:
+        # https://github.com/scikit-learn-contrib/skope-rules/issues/18
+        with parallel_backend('threading', n_jobs=-1):
+            grid_SV.fit(X, Y, groups)     
     
     return grid_SV
 
@@ -964,7 +990,7 @@ def generate_distances(SeqDat, Name_Dict, Hist_Type):
     
     # distances are determined relative to reference
     if Hist_Type == 1:
-        if Name_Dict['RefSeq'] is not '':
+        if Name_Dict['RefSeq'] != '':
             RefSeq = Name_Dict['RefSeq']
             print('use reference sequence')
         else:    
@@ -1086,7 +1112,7 @@ def Predict_SequenceActivity(Sequence, Name_Dict):
             # extracting the positions that were removed because of insufficient information content
             Positions_removed = Data_Prep_Params['Positions_removed']
             # removed positions should be identical to the reference
-            if Name_Dict['RefSeq'] is not '':
+            if Name_Dict['RefSeq'] != '':
                 Sequence_relevant = ''.join((char for idx, char in enumerate(Sequence) if idx in Positions_removed))
                 Reference_relevant = ''.join((char for idx, char in enumerate(Name_Dict['RefSeq']) if idx in Positions_removed))
                 if Sequence_relevant != Reference_relevant:
@@ -1160,15 +1186,15 @@ def decode(individual):
     return gene
 
 
-def evaluation(individual):
+def evaluation(individual, myRegr, nNucleotides):
     gene = decode(individual)
     
     # Calculate the gc share and append it to the input
     gc_share =0
-    for i in range(0,nNukleotides,4):
+    for i in range(0,nNucleotides,4):
         gc_share += gene[i+1] + gene[i+2]
 
-    gc_share /= nNukleotides
+    gc_share /= nNucleotides
     
     regressor_input = gene + [gc_share]
     
@@ -1193,6 +1219,7 @@ def feasible(individual):
     return True
 
 def distance(individual, RefSeqs):
+    import numpy as np
     RefNum = np.array(RefSeqs, ndmin=2).shape[0]
     d = np.sum(np.not_equal([individual]*RefNum, RefSeqs))    
     return (d,)
@@ -1201,6 +1228,8 @@ def SequenceSinglePredFull(SeqPred, RefFull, Positions_removed):
     '''
     The optimization results in a sequence list for positions that were used as features in the prediction. Thus, additional sequence elements have to be added that where removed because of insufficient diversity.
     '''
+    import numpy as np
+    
     # Extracting feature positions from RefFull, i.e. deleting with Positions_removed
     RefNum = len(RefFull)
     RefFull_ar = np.reshape(np.array([Let for Seq in np.array(RefFull) for Let in Seq]),(RefNum,-1))
@@ -1216,7 +1245,7 @@ def SequenceSinglePredFull(SeqPred, RefFull, Positions_removed):
     PredSeqTemp = np.array([Letter for Letter in RefFull[np.argmin(myDist)]])
     
     # Position_removed contains the indices of positions that were not used for activity prediction.     
-    Pos_Test = np.delete(np.reshape(np.arange(0,RefFull_ar.shape[1]),(-1,1)), myParams['Positions_removed'])
+    Pos_Test = np.delete(np.reshape(np.arange(0,RefFull_ar.shape[1]),(-1,1)), Positions_removed)
 
     # Replacing the predicted sequence into the reference sequence
     PredSeqTemp[Pos_Test] = [Letter for Letter in SeqPred]
@@ -1224,71 +1253,207 @@ def SequenceSinglePredFull(SeqPred, RefFull, Positions_removed):
 
     return PredSeq
 
-def make_GAtoolbox(nPositions, myRefSeqs, npop=1000, ngen=30):
+
+def ExtractRefSeq(SeqDat, Name_Dict, Target_Express, RefNum):
     '''
-    The function generates a 'toolobox' and 'stats' variable that is used in the GA optimization. It contains the optimization function, and additional functions to characterize the solution space.
+    The function extracts a defined number of reference sequences from the promoter library. The output is a dataframe.
     '''
-    import random
     import numpy as np
-    from deap import base, creator, tools, algorithms
-    from ExpressionExpert_Functions import distance
+    import pandas as pd
+    import warnings
+
+    # extraction of the #RefNum closest sequences in the measured reference set to the target expression
+    Y_Col_Name = eval(Name_Dict['Y_Col_Name'])
+    if len(Y_Col_Name) > 1:
+        warnings.warn('Only single library analysis is currently suported. First library is used.')
+        
+    YCNum = 0
+#     ML_TargetCol = '{}_ML'.format(Y_Col_Name[YCNum])
+    Seq_LetterCol = '{}_letter-encrypted'.format(Name_Dict['Sequence_column'])
+#     Seq_CategoCol = '{}_label-encrypted'.format(Name_Dict['Sequence_column'])
+    SeqIdx = np.argpartition(np.ravel(np.array(np.abs(SeqDat[Y_Col_Name[YCNum]]-Target_Express))), RefNum)[:RefNum]
+    letseq = SeqDat.loc[SeqIdx, Seq_LetterCol].values
+    mydict = dict({'Idx-Original':SeqIdx, 'Strain-ID':SeqDat.loc[SeqIdx, Name_Dict['ID_Col_Name']].values, 'Sequence':letseq, 'target':SeqDat.loc[SeqIdx, Y_Col_Name[YCNum]].values})
+    myDF = pd.DataFrame(mydict)
     
-    toolbox = base.Toolbox()
+    return myDF
 
-    ###################### Define individuals and poopulation ##########################
 
-    # Define type of fitness function (weight=-1 => minimization)
-    creator.create("FitnessMax", base.Fitness, weights=(-1.0,))
-
-    # Define container that represents individual (individual is a list and has the defined fitness)
-    creator.create("Individual", list, fitness=creator.FitnessMax)
-
-    # Define how individual is created (individual object is filled with nPosition random integers that represent the
-    # nukleotides)
-    toolbox.register("attr_int", random.randint, 0, 3)
-    toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_int, nPositions)
-
-    # Define how population is created (population is a list of individuals)
-    toolbox.register("population", tools.initRepeat, list, toolbox.individual)
-
-    ###################### Set fucntions for GA steps ##########################
-
-    # Set selection function (selTournament: randomly select tournsize individuals and select the best one as parent)
-    # The selection function is later repeated n times in each generation to generate n parents 
-    toolbox.register("select", tools.selTournament, tournsize=3)
-
-    # Set mating function ( cxUniform: takes two parents and transforms them into two childs by iterating over the
-    # positions and swapping the nukleotides between the parents with a probability of indpb at each position)
-    toolbox.register("mate", tools.cxUniform, indpb=0.5)
-
-    # Set mutation function (mutUniformInt: mutate a child by iterating over its positions and assigning a new
-    # nukleotide with probability indpb)
-    toolbox.register("mutate", tools.mutUniformInt, low=0, up=3, indpb=0.1)
-
-    # Set fitness function
-    toolbox.register("evaluate", distance, RefSeqs=myRefSeqs)
-    # Add constraint handling ()
-    toolbox.decorate("evaluate", tools.DeltaPenalty(feasible, 1000.0))
-
-    ###################### Define statistics to be evaluated at each generation ##########################
-    stats = tools.Statistics(lambda ind: ind.fitness.values)
-    stats.register("avg", np.mean)
-    stats.register("std", np.std)
-    stats.register("min", np.min)
-    stats.register("max", np.max)
+class GeneOptimizer():
+    # Static variables
+    creator_used = False
     
-    # Create initial population
-    pop = toolbox.population(n=npop)
+    def __init__(self, parallelEvaluation=False, tournsize=3, mateindpb=0.5, mutindpb=0.05):
+        import random
+        import numpy as np
+        from deap import base, creator, tools, algorithms    
+        self._toolbox = base.Toolbox()
 
-    # Create hall of fame object that keeps track of the best individual
-    hof = tools.HallOfFame(5)
+        # Enable parallel fitness evaluation if specified
+        if parallelEvaluation:
+            pool = multiprocessing.Pool()
+            self._toolbox.register("map", pool.map)
+            
+        ###################### Define individuals ##########################
 
-    # Perform GA
-    # cxpb: probability that two parents mate (if they do they are discared and their child kept, otherwise they 
-    #       are kept)
-    # mutpb: probability that a child is mutated
-    # ngen: number of generations(=iterations)
-    pop, log = algorithms.eaSimple(pop, toolbox, cxpb=0.5, mutpb=0.5, ngen=ngen, 
-                                   stats=stats, halloffame=hof, verbose=True)
+        # Use static variable to prevent recreating FitnessMax and Individual
+        if GeneOptimizer.creator_used == False:
+            # Define type of fitness function (weight=-1 => minimization)
+            creator.create("FitnessMax", base.Fitness, weights=(-1.0,))
+
+            # Define container that represents individual (individual is a list and has the defined fitness)
+            creator.create("Individual", list, fitness=creator.FitnessMax)
+            
+            GeneOptimizer.creator_used = True
+
+        # Define how individual is created (individual object is filled with nPosition random integers that represent the
+        # nukleotides)
+        self._toolbox.register("attr_nukleotide", random.randint, 0, 3)
+        #self._toolbox.register("attr_nukleotide", random.choice, ['A', 'C', 'G', 'T'])
+        
+        ###################### Set fucntions for GA steps ##########################
+
+        # Set selection function (selTournament: randomly select tournsize individuals and select the best one as parent)
+        # The selection function is later repeated n times in each generation to generate n parents 
+        self._toolbox.register("select", tools.selTournament, tournsize=tournsize)
+
+        # Set mating function ( cxUniform: takes two parents and transforms them into two childs by iterating over the
+        # positions and swapping the nukleotides between the parents with a probability of indpb at each position)
+        self._toolbox.register("mate", tools.cxUniform, indpb=mateindpb)
+
+        # Set mutation function (mutUniformInt: mutate a child by iterating over its positions and assigning a new
+        # nukleotide with probability indpb)
+        self._toolbox.register("mutate", tools.mutUniformInt, low=0, up=3, indpb=mutindpb)
+        
+        ###################### Define statistics to be evaluated at each generation ##########################
+        self._stats = tools.Statistics(lambda ind: ind.fitness.values)
+        self._stats.register("avg", np.mean)
+        self._stats.register("std", np.std)
+        self._stats.register("min", np.min)
+        self._stats.register("max", np.max)
+
     
-    return hof, toolbox, stats
+    def _decode(self, individual):
+        seq = list()
+        for i in individual:
+            if i == 0:
+                seq += [1, 0, 0, 0]
+            elif i == 1:
+                seq += [0, 1, 0, 0]
+            elif i == 2:
+                seq += [0, 0, 1, 0]
+            elif i == 3:
+                seq += [0, 0, 0, 1]
+
+        return seq
+
+
+    def _evaluation(self, individual):
+        seq = self._decode(individual)
+        # Calculate the gc share and append it to the input
+        gc_share =0
+        for i in range(0,self._n_nukleotides,4):
+            gc_share += seq[i+1] + seq[i+2]
+
+        gc_share /= self._n_nukleotides
+
+        # Calculate expression for the individual
+        regressor_input = seq + [gc_share]
+        expression = self._regr.predict([regressor_input])
+
+        return expression[0]
+
+    def _feasible(self, individual):
+        # Check if individual belongns to known sequences
+        if tuple(individual) in list(self._sequences['Sequence_short_encoded']):
+            return False
+        
+        # Check if individual has desired expression level
+        expression = self._evaluation(individual)
+        if expression != self._target_expr:
+            return False
+
+        return True
+
+    def _distance(self, individual):
+        import numpy as np
+        RefNum = np.array(self._reference_sequences, ndmin=2).shape[0]
+        d = np.sum(
+                np.not_equal(
+                    np.array([individual]*RefNum, dtype=int),
+                    np.array(self._reference_sequences, dtype=int)
+                )
+            )    
+        
+        return (d,)
+    
+    def _setReferenceSequences(self, sequences, Positions_removed):
+        import numpy as np
+        # Ensure that nukleotides are only encoded by upper case letters
+        self._sequences['Sequence'] = self._sequences['Sequence'].str.upper()
+        
+        # Split sequence into its elements and delete the ones with too low variance
+        sequences_split = np.array(list(self._sequences['Sequence'].apply(list)))
+        sequences_short = np.delete(sequences_split, Positions_removed, axis=1)
+        
+        # Apply encoding to nukleotides
+        sequences_short[sequences_short == 'A'] = 0
+        sequences_short[sequences_short == 'C'] = 1
+        sequences_short[sequences_short == 'G'] = 2
+        sequences_short[sequences_short == 'T'] = 3
+
+        # Add encoded and shortened sequences to datframe and convert them to tuples 
+        # to make them hashable (required for comparison later)
+        self._sequences['Sequence_short_encoded'] = sequences_short.astype(str).tolist()
+        self._sequences['Sequence_short_encoded'] = self._sequences['Sequence_short_encoded'].apply(tuple)
+
+        # By shortening the sequences some may not be distinguishable anymore. Only the shortened sequence
+        # with the highest expression is keeped (through sorting the instance with the highest expression
+        # always comes first)
+#         self._sequences = self._sequences.sort_values('Promoter Activity', ascending=False)
+        self._sequences = self._sequences.drop_duplicates('Sequence_short_encoded')
+
+        # Store the 5 sequences with the highest expression
+        self._reference_sequences = self._sequences['Sequence_short_encoded'].iloc[0:5].tolist()        
+    
+    def optimize(self, regr, sequences, Positions_removed, n_nukleotides, target_expr=2, cxpb=0.5, mutpb=0.2, ngen=50, hof_size=1, n_pop=300):
+        from deap import base, creator, tools, algorithms    
+
+        ###################### Set problem dependent variables and functions ##########################
+        self._target_expr = target_expr
+        self._regr = regr
+        self._n_nukleotides = n_nukleotides
+        self._sequences = sequences.copy()
+        self._setReferenceSequences(sequences, Positions_removed)
+        n_postitions = int(self._n_nukleotides/4)
+
+        # Define how an individual is created (a list of nuleotids
+        self._toolbox.register("individual", tools.initRepeat, creator.Individual,
+                               self._toolbox.attr_nukleotide, n_postitions)
+        # Define how population is created (population is a list of individuals)
+        self._toolbox.register("population", tools.initRepeat, list, self._toolbox.individual)
+        
+        # Set fitness function
+        self._toolbox.register("evaluate", self._distance)
+        # Add constraint handling ()
+        self._toolbox.decorate("evaluate", tools.DeltaPenalty(self._feasible, 1000.0))
+
+
+        ###################### Peform optimization ##########################
+
+        # Create initial population
+        pop = self._toolbox.population(n=n_pop)
+
+        # Create hall of fame object that keeps track of the best individual
+        hof = tools.HallOfFame(hof_size)
+
+        # Perform GA
+        # cxpb: probability that two parents mate (if they do they are discared and their child kept, otherwise they 
+        #       are kept)
+        # mutpb: probability that a child is mutated
+        # ngen: number of generations(=iterations)
+        pop, log = algorithms.eaSimple(pop, self._toolbox, cxpb=cxpb, mutpb=mutpb, ngen=ngen, 
+                                       stats=self._stats, halloffame=hof, verbose=True)
+
+
+        return [seq for seq in hof], [self._evaluation(seq) for seq in hof]
