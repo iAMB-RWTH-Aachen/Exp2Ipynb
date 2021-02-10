@@ -162,8 +162,8 @@ def Data_Src_Load(Name_Dict):
         for Measurement in Y_Col_Name:
             CatName = '{}_ML'.format(Measurement)
             SeqDat[CatName], bins = pd.qcut(SeqDat[Measurement], q=BinNum, labels=range(BinNum), retbins=True)
+            print('The expression values were sorted into the following bins: {}'.format(bins))
         SeqDat.drop_duplicates('Sequence_letter-encrypted', inplace=True)   
-        print('The expression values were sorted into the following bins: {}'.format(bins))
         
     else:
         print('Response value parameter must be an positive integer number')
@@ -1254,7 +1254,7 @@ def SequenceSinglePredFull(SeqPred, RefFull, Positions_removed):
     return PredSeq
 
 
-def ExtractRefSeq(SeqDat, Name_Dict, Target_Express, RefNum):
+def ExtractRefSeq(SeqDat, Name_Dict, Target_Express, RefNum, Meas_Idx=0):
     '''
     The function extracts a defined number of reference sequences from the promoter library. The output is a dataframe.
     '''
@@ -1264,16 +1264,16 @@ def ExtractRefSeq(SeqDat, Name_Dict, Target_Express, RefNum):
 
     # extraction of the #RefNum closest sequences in the measured reference set to the target expression
     Y_Col_Name = eval(Name_Dict['Y_Col_Name'])
-    if len(Y_Col_Name) > 1:
-        warnings.warn('Only single library analysis is currently suported. First library is used.')
+#     if len(Y_Col_Name) > 1:
+#         warnings.warn('Only single library analysis is currently suported. First library is used.')
         
-    YCNum = 0
+#     YCNum = 0
 #     ML_TargetCol = '{}_ML'.format(Y_Col_Name[YCNum])
     Seq_LetterCol = '{}_letter-encrypted'.format(Name_Dict['Sequence_column'])
 #     Seq_CategoCol = '{}_label-encrypted'.format(Name_Dict['Sequence_column'])
-    SeqIdx = np.argpartition(np.ravel(np.array(np.abs(SeqDat[Y_Col_Name[YCNum]]-Target_Express))), RefNum)[:RefNum]
+    SeqIdx = np.argpartition(np.ravel(np.array(np.abs(SeqDat[Y_Col_Name[Meas_Idx]]-Target_Express))), RefNum)[:RefNum]
     letseq = SeqDat.loc[SeqIdx, Seq_LetterCol].values
-    mydict = dict({'Idx-Original':SeqIdx, 'Strain-ID':SeqDat.loc[SeqIdx, Name_Dict['ID_Col_Name']].values, 'Sequence':letseq, 'target':SeqDat.loc[SeqIdx, Y_Col_Name[YCNum]].values})
+    mydict = dict({'Idx-Original':SeqIdx, 'Strain-ID':SeqDat.loc[SeqIdx, Name_Dict['ID_Col_Name']].values, 'Sequence':letseq, 'target':SeqDat.loc[SeqIdx, Y_Col_Name[Meas_Idx]].values})
     myDF = pd.DataFrame(mydict)
     
     return myDF
