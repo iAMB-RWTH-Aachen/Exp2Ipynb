@@ -21,10 +21,10 @@ CorrPlot_File: Plot_Corr-Ytrue-VS-Ypred
 Csv_ID: Synth-Library
 X_Expr: Plot_CrossExpr
 RefSeq: 
-ML_Regressor: RFR
+ML_Regressor: RFC
 #Data_Standard: False
 SynLib_Date: 20200904
-ML_Date: 20210210
+ML_Date: 00000000
 TestRatio: 0.1
 Expression_Unit: $\mu$M(GFP)/(gCDW*h)
 Sequence_Distance_cutoff: 0.5

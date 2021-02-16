@@ -1221,7 +1221,10 @@ def feasible(individual):
 def distance(individual, RefSeqs):
     import numpy as np
     RefNum = np.array(RefSeqs, ndmin=2).shape[0]
-    d = np.sum(np.not_equal([individual]*RefNum, RefSeqs))    
+    d = np.sum(
+            np.not_equal(
+                [individual]*RefNum, 
+                RefSeqs))    
     return (d,)
 
 def SequenceSinglePredFull(SeqPred, RefFull, Positions_removed):
@@ -1376,6 +1379,8 @@ class GeneOptimizer():
         return True
 
     def _distance(self, individual):
+#         RefSeqs = self._reference_sequences
+#         d = distance(individual, RefSeqs)
         import numpy as np
         RefNum = np.array(self._reference_sequences, ndmin=2).shape[0]
         d = np.sum(
