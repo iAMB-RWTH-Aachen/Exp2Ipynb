@@ -3,7 +3,7 @@ Data_File: PromLib_EcolPtai.csv
 Sequence_column: Sequence
 Y_Col_Name: ['Ecol Promoter Activity', 'Ptai Promoter Activity']
 ID_Col_Name: Strain ID Ecol
-Response_Value: 3
+Response_Value: 1
 Remove_Outlier: False
 Stats2Samples: False
 Stats_Std:
@@ -24,7 +24,7 @@ RefSeq:
 ML_Regressor: RFR
 #Data_Standard: False
 SynLib_Date: 20200904
-ML_Date: 20210210
+ML_Date: 00000000
 TestRatio: 0.1
 Expression_Unit: $\mu$M(GFP)/(gCDW*h)
 Sequence_Distance_cutoff: 0.5

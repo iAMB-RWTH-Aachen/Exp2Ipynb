@@ -1170,7 +1170,7 @@ def toCat(myLetters):
     
     return myCats
 
-# Convert the integer encoding of the nukleotides used by the GA into a one-hot encoding
+# Convert the integer encoding of the nucleotides used by the GA into a one-hot encoding
 def decode(individual):
     gene = list()
     for i in individual:
@@ -1220,8 +1220,9 @@ def feasible(individual):
 
 def distance(individual, RefSeqs):
     import numpy as np
-    RefNum = np.array(RefSeqs, ndmin=2).shape[0]
-    d = np.sum(np.not_equal([individual]*RefNum, RefSeqs))    
+    myRefs = np.array(RefSeqs, ndmin=2, dtype=int)
+    myind = np.array([individual]*myRefs.shape[0], dtype=int)
+    d = np.sum(np.not_equal(myind, myRefs))    
     return (d,)
 
 def SequenceSinglePredFull(SeqPred, RefFull, Positions_removed):
@@ -1307,9 +1308,9 @@ class GeneOptimizer():
             GeneOptimizer.creator_used = True
 
         # Define how individual is created (individual object is filled with nPosition random integers that represent the
-        # nukleotides)
-        self._toolbox.register("attr_nukleotide", random.randint, 0, 3)
-        #self._toolbox.register("attr_nukleotide", random.choice, ['A', 'C', 'G', 'T'])
+        # nucleotides)
+        self._toolbox.register("attr_nucleotide", random.randint, 0, 3)
+        #self._toolbox.register("attr_nucleotide", random.choice, ['A', 'C', 'G', 'T'])
         
         ###################### Set fucntions for GA steps ##########################
 
@@ -1318,11 +1319,11 @@ class GeneOptimizer():
         self._toolbox.register("select", tools.selTournament, tournsize=tournsize)
 
         # Set mating function ( cxUniform: takes two parents and transforms them into two childs by iterating over the
-        # positions and swapping the nukleotides between the parents with a probability of indpb at each position)
+        # positions and swapping the nucleotides between the parents with a probability of indpb at each position)
         self._toolbox.register("mate", tools.cxUniform, indpb=mateindpb)
 
         # Set mutation function (mutUniformInt: mutate a child by iterating over its positions and assigning a new
-        # nukleotide with probability indpb)
+        # nucleotide with probability indpb)
         self._toolbox.register("mutate", tools.mutUniformInt, low=0, up=3, indpb=mutindpb)
         
         ###################### Define statistics to be evaluated at each generation ##########################
@@ -1348,14 +1349,14 @@ class GeneOptimizer():
         return seq
 
 
-    def _evaluation(self, individual):
+    def _evaluation_express(self, individual):
         seq = self._decode(individual)
         # Calculate the gc share and append it to the input
         gc_share =0
-        for i in range(0,self._n_nukleotides,4):
+        for i in range(0,self._n_nucleotides,4):
             gc_share += seq[i+1] + seq[i+2]
 
-        gc_share /= self._n_nukleotides
+        gc_share /= self._n_nucleotides
 
         # Calculate expression for the individual
         regressor_input = seq + [gc_share]
@@ -1363,20 +1364,35 @@ class GeneOptimizer():
 
         return expression[0]
 
-    def _feasible(self, individual):
+    def _evaluation_object(self, individual):
+        expression = self._evaluation_express(individual)
+        objective = (expression-self._target_expr)**2
+        
+        return objective
+    
+    def _feasible_classify(self, individual):
         # Check if individual belongns to known sequences
         if tuple(individual) in list(self._sequences['Sequence_short_encoded']):
             return False
         
         # Check if individual has desired expression level
-        expression = self._evaluation(individual)
+        expression = self._evaluation_express(individual)
         if expression != self._target_expr:
             return False
 
         return True
 
+    def _feasible_regress(self, individual):
+        # Check if individual belongns to known sequences
+        if tuple(individual) in list(self._sequences['Sequence_short_encoded']):
+            return False
+        
+        return True
+
     def _distance(self, individual):
         import numpy as np
+#         RefSeqs = self._reference_sequences
+#         d = distance(individual, RefSeqs)
         RefNum = np.array(self._reference_sequences, ndmin=2).shape[0]
         d = np.sum(
                 np.not_equal(
@@ -1389,14 +1405,14 @@ class GeneOptimizer():
     
     def _setReferenceSequences(self, sequences, Positions_removed):
         import numpy as np
-        # Ensure that nukleotides are only encoded by upper case letters
+        # Ensure that nucleotides are only encoded by upper case letters
         self._sequences['Sequence'] = self._sequences['Sequence'].str.upper()
         
         # Split sequence into its elements and delete the ones with too low variance
         sequences_split = np.array(list(self._sequences['Sequence'].apply(list)))
         sequences_short = np.delete(sequences_split, Positions_removed, axis=1)
         
-        # Apply encoding to nukleotides
+        # Apply encoding to nucleotides
         sequences_short[sequences_short == 'A'] = 0
         sequences_short[sequences_short == 'C'] = 1
         sequences_short[sequences_short == 'G'] = 2
@@ -1413,30 +1429,39 @@ class GeneOptimizer():
 #         self._sequences = self._sequences.sort_values('Promoter Activity', ascending=False)
         self._sequences = self._sequences.drop_duplicates('Sequence_short_encoded')
 
-        # Store the 5 sequences with the highest expression
+        # Store the sequences with the highest expression
         self._reference_sequences = self._sequences['Sequence_short_encoded'].iloc[0:5].tolist()        
     
-    def optimize(self, regr, sequences, Positions_removed, n_nukleotides, target_expr=2, cxpb=0.5, mutpb=0.2, ngen=50, hof_size=1, n_pop=300):
+    def optimize(self, regr, OptType, sequences, Positions_removed, n_nucleotides, target_expr=2, cxpb=0.5, mutpb=0.2, ngen=50, hof_size=1, n_pop=300):
         from deap import base, creator, tools, algorithms    
 
         ###################### Set problem dependent variables and functions ##########################
         self._target_expr = target_expr
         self._regr = regr
-        self._n_nukleotides = n_nukleotides
+        self._n_nucleotides = n_nucleotides
         self._sequences = sequences.copy()
         self._setReferenceSequences(sequences, Positions_removed)
-        n_postitions = int(self._n_nukleotides/4)
+        n_postitions = int(self._n_nucleotides/4)
 
         # Define how an individual is created (a list of nuleotids
         self._toolbox.register("individual", tools.initRepeat, creator.Individual,
-                               self._toolbox.attr_nukleotide, n_postitions)
+                               self._toolbox.attr_nucleotide, n_postitions)
         # Define how population is created (population is a list of individuals)
         self._toolbox.register("population", tools.initRepeat, list, self._toolbox.individual)
         
-        # Set fitness function
-        self._toolbox.register("evaluate", self._distance)
-        # Add constraint handling ()
-        self._toolbox.decorate("evaluate", tools.DeltaPenalty(self._feasible, 1000.0))
+        if OptType == 'C':
+            # Set fitness function
+            self._toolbox.register("evaluate", self._distance)
+            # Add constraint handling ()
+            self._toolbox.decorate("evaluate", tools.DeltaPenalty(self._feasible_classify, 1000.0))
+        elif OptType == 'R':
+            # Set fitness function
+            self._toolbox.register("evaluate", self._evaluation_object)
+            # Add constraint handling ()
+            self._toolbox.decorate("evaluate", tools.DeltaPenalty(self._feasible_regress, 1000.0))  
+        else:
+            print('Check machine learning type. The variable \'ML_Type\' must contain either \'R\' for regression or \'C\' for classification.')
+            return
 
 
         ###################### Peform optimization ##########################
@@ -1456,4 +1481,4 @@ class GeneOptimizer():
                                        stats=self._stats, halloffame=hof, verbose=True)
 
 
-        return [seq for seq in hof], [self._evaluation(seq) for seq in hof]
+        return [seq for seq in hof], [self._evaluation_express(seq) for seq in hof]
