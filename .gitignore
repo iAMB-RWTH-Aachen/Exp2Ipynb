@@ -12,3 +12,8 @@ XHost_*
 config_XHostAvg.txt
 config_Spacer.txt
 confit_snth.txt
+build/
+dist/
+Exp2Ipynb.egg-info/
+Exp2Ipynb/__pycache__/
+stuff/
