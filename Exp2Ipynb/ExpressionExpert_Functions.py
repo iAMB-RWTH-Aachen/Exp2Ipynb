@@ -1368,7 +1368,7 @@ class GeneOptimizer():
         expression = self._evaluation_express(individual)
         objective = (expression-self._target_expr)**2
         
-        return objective
+        return (objective,)
     
     def _feasible_classify(self, individual):
         # Check if individual belongns to known sequences
