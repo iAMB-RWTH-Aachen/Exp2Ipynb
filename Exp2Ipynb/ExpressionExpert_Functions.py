@@ -644,7 +644,7 @@ def MyRF(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', R
         # in some cases, parallel jobs given via GridSearchCV 'n_jobs' generates an error:
         # https://github.com/scikit-learn-contrib/skope-rules/issues/18
 
-        with parallel_backend('threading', n_jobs=-1):
+        with parallel_backend('threading'):
             grid_forest.fit(X, Y, groups) # with groups
            
     return grid_forest
@@ -1371,8 +1371,9 @@ class GeneOptimizer():
         return (objective,)
     
     def _feasible_classify(self, individual):
-        # Check if individual belongns to known sequences
-        if tuple(individual) in list(self._sequences['Sequence_short_encoded']):
+        import numpy as np
+        # Check if individual belongs to known sequences
+        if list(individual) in self._SeqDB: # tuple(individual) in list(self._sequences['Sequence_short_encoded']):
             return False
         
         # Check if individual has desired expression level
@@ -1402,6 +1403,12 @@ class GeneOptimizer():
             )    
         
         return (d,)
+
+    def _setSeqDB(self, SeqDat, Positions_removed):
+        import numpy as np
+        SeqDB_np = np.vstack(SeqDat['Sequence_label-encrypted'].values)
+        self._SeqDB = np.unique(np.delete(SeqDB_np, Positions_removed, axis=1), axis=0).tolist()
+        
     
     def _setReferenceSequences(self, sequences, Positions_removed):
         import numpy as np
@@ -1432,7 +1439,7 @@ class GeneOptimizer():
         # Store the sequences with the highest expression
         self._reference_sequences = self._sequences['Sequence_short_encoded'].iloc[0:5].tolist()        
     
-    def optimize(self, regr, OptType, sequences, Positions_removed, n_nucleotides, target_expr=2, cxpb=0.5, mutpb=0.2, ngen=50, hof_size=1, n_pop=300):
+    def optimize(self, regr, OptType, sequences, SeqDat, Positions_removed, n_nucleotides, target_expr=2, cxpb=0.5, mutpb=0.2, ngen=50, hof_size=1, n_pop=300):
         from deap import base, creator, tools, algorithms    
 
         ###################### Set problem dependent variables and functions ##########################
@@ -1440,6 +1447,7 @@ class GeneOptimizer():
         self._regr = regr
         self._n_nucleotides = n_nucleotides
         self._sequences = sequences.copy()
+        self._setSeqDB(SeqDat, Positions_removed)
         self._setReferenceSequences(sequences, Positions_removed)
         n_postitions = int(self._n_nucleotides/4)
 

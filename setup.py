@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name='Exp2Ipynb',
-    version='0.0.4',
+    version='0.0.5',
     Author='Ulf Liebal',
     author_email='ulf.liebal@rwth-aachen.de',
     description='Exp2Ipynb supports the analysis of gene expression libraries.',
