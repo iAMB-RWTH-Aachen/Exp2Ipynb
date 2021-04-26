@@ -3,7 +3,7 @@ Data_File: dengyu_Ecol_73.csv
 Sequence_column: Sequence
 Y_Col_Name: ['Activity']
 ID_Col_Name: Name
-Response_Value: 1
+Response_Value: 3
 Remove_Outlier: True
 Stats2Samples: True
 Stats_Std: ['Error']
@@ -24,7 +24,7 @@ RefSeq:
 ML_Regressor: RFR
 Data_Standard: True
 SynLib_Date: 20200828
-ML_Date: 20201120
+ML_Date: 20210426
 TestRatio: 0.1
 Expression_Unit: GFP Activity
 Sequence_Distance_cutoff: 0.9

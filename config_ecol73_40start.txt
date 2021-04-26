@@ -24,7 +24,7 @@ RefSeq:
 ML_Regressor: RFR
 Data_Standard: True
 SynLib_Date: 20200828
-ML_Date: 20201120
+ML_Date: 20210426
 TestRatio: 0.1
 Expression_Unit: GFP Activity
 Sequence_Distance_cutoff: 0.9
