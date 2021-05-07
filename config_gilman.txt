@@ -23,8 +23,8 @@ X_Expr: Plot_CrossExpr
 RefSeq: 
 ML_Regressor: RFR
 Data_Standard: False
-SynLib_Date: 00000000
-ML_Date: 20210426
+SynLib_Date: 
+ML_Date: 00000000
 TestRatio: 0.1
 Expression_Unit: relative-strength
 Sequence_Distance_cutoff: 0.9

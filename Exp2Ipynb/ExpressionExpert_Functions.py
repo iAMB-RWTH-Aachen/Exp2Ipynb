@@ -623,11 +623,11 @@ def MyRF(SeqOH, Validation_cutoff=.1, Num=100, Y_Col_Name='promoter activity', R
         X = np.append(X,np.array(SeqOH[AddFeat]), axis=1)
     Y = SeqOH[Y_Col_Name].values
     groups = SeqOH['Sequence_letter-encrypted']
-    Number_Estimators = np.array([40])   # overfit parameter: 40
+    Number_Estimators = np.array([20])   # overfit parameter: 40
     Max_Features = np.arange(10,30,2)     # overfit parameter: 15
     min_samples_split = np.arange(3,4,1) # overfit parameter: 3
-    max_depth = np.arange(2,10,4)        # overfit parameter: 35
-    min_samples_leaf = np.array([3])     # overfit parameter: 2
+    max_depth = np.arange(2,5,1)        # overfit parameter: 35
+    min_samples_leaf = np.array([4])     # overfit parameter: 2
     param_grid = [{'bootstrap':[False], 'n_estimators': Number_Estimators, 'max_features': Max_Features, 'min_samples_split': min_samples_split, 'max_depth':max_depth, 'min_samples_leaf':min_samples_leaf}]
     # Group shuffle split removes groups with identical sequences from the development set
     # This is more realistic for parameter estimation
