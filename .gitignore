@@ -2,7 +2,8 @@
 __pycache__/
 Analysis/data-*
 Analysis/XHost_*
-stuff/
 exp2ipynb/__pycache__
 exp2ipynb/__pycache__
 exp2ipynb/__pycache__/exp2ipynb
+stuff/
+RegressorTests/
