@@ -1,11 +1,8 @@
 .ipynb_checkpoints/
 __pycache__/
-'=0.3.3'
 Analysis/data-*
 Analysis/XHost_*
-config_Spacer.txt
-build/
-dist/
-Exp2Ipynb.egg-info/
-Exp2Ipynb/__pycache__/
 stuff/
+exp2ipynb/__pycache__
+exp2ipynb/__pycache__
+exp2ipynb/__pycache__/exp2ipynb

@@ -13,7 +13,8 @@ dependencies:
 - scipy=1.4.1
 - pylab-sdk=1.1.2
 - openpyxl=3.0.3
-- scikit-learn=0.22.2
-- logomaker=0.8
-- deap=1.3.1
+- scikit-learn>=0.24.2
+- logomaker>=0.8
+- deap>=1.3.1
+- pydot>=1.4.1
 

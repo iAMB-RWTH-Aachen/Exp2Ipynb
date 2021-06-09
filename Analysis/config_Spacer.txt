@@ -1,14 +1,14 @@
 # This file contains the naming conventions for all output files. It is automatically generated when going through step "0-Workflow".
-Data_File: Example1-Pput.csv
-Sequence_column: Sequence
-Y_Col_Name: ['Promoter Activity']
-ID_Col_Name: Strain ID
-Response_Value: 3
-Remove_Outlier: True
+Data_File: XHost_Replicates_Seq+Spacer.csv
+Sequence_column: Spacer
+Y_Col_Name: ['Ecol-Activity', 'Ptai-Activity']
+ID_Col_Name: Strain ID Ptai
+Response_Value: 0
+Remove_Outlier: False
 Stats2Samples: False
-Stats_Std: ['Error']
-Stats_Samples: ['Samples']
-Library_Expression: 1
+Stats_Std:
+Stats_Samples:
+Library_Expression: 2
 Add_Feat: ['GC-content']
 Figure_Type: svg
 HM_File: Plot_PositionNucleotideStats
@@ -21,11 +21,13 @@ CorrPlot_File: Plot_Corr-Ytrue-VS-Ypred
 Csv_ID: Synth-Library
 X_Expr: Plot_CrossExpr
 RefSeq: 
-ML_Regressor: RFC
-ML_Date: 00000000
+ML_Regressor: RFR
+Data_Standard: True
+SynLib_Date: 20200904
+ML_Date: 20200904
 TestRatio: 0.1
-Expression_Unit: GFP Activity
-Sequence_Distance_cutoff: 0.1
-Entropy_cutoff: 0.2
+Expression_Unit: $\mu$M(GFP)/(gCDW*h)
+Sequence_Distance_cutoff: 0.5
+Entropy_cutoff: 1
 Synth_Seq_MaxNumber: 10000
-Figure_Font_Size: 18
+Figure_Font_Size: 12

@@ -19,7 +19,7 @@ setuptools.setup(
         'scikit-learn>=0.22.0',
         'logomaker>=0.8',
         'deap>=1.3.0',
-        'pydot'
+        'pydot>=1.4.1'
     ],
     classifiers=[
         'Programming Language :: Python :: 3',
