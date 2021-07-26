@@ -1,0 +1,419 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% This is just an example/guide for you to refer to when submitting manuscripts to Frontiers, it is not mandatory to use Frontiers .cls files nor frontiers.tex  %
+% This will only generate the Manuscript, the final article will be typeset by Frontiers after acceptance.   
+%                                              %
+%                                                                                                                                                         %
+% When submitting your files, remember to upload this *tex file, the pdf generated with it, the *bib file (if bibliography is not within the *tex) and all the figures.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% Version 3.4 Generated 2018/06/15 %%%
+%%% You will need to have the following packages installed: datetime, fmtcount, etoolbox, fcprefix, which are normally inlcuded in WinEdt. %%%
+%%% In http://www.ctan.org/ you can find the packages and how to install them, if necessary. %%%
+%%%  NB logo1.jpg is required in the path in order to correctly compile front page header %%%
+
+% Reference articles in Frontiers:
+% https://www.frontiersin.org/articles/10.3389/fmicb.2020.595910/full
+% https://www.frontiersin.org/articles/10.3389/fmicb.2021.614355/full
+% https://www.frontiersin.org/articles/10.3389/fmicb.2018.00522/full
+
+
+\documentclass[utf8]{frontiersSCNS} % for Science, Engineering and Humanities and Social Sciences articles
+%\documentclass[utf8]{frontiersHLTH} % for Health articles
+%\documentclass[utf8]{frontiersFPHY} % for Physics and Applied Mathematics and Statistics articles
+
+%\setcitestyle{square} % for Physics and Applied Mathematics and Statistics articles
+\usepackage{url,hyperref,lineno,microtype,subcaption}
+\usepackage[onehalfspacing]{setspace}
+
+\linenumbers
+
+
+% Leave a blank line between paragraphs instead of using \\
+
+
+\def\keyFont{\fontsize{8}{11}\helveticabold }
+\def\firstAuthorLast{Liebal {et~al.}} %use et al only if is more than 1 author
+\def\Authors{Ulf W. Liebal\,$^{1,*}$, Sebastian Köbbing\,$^{1}$, Linux Netze\,$^{2}$, Artur M. Schweidtmann\,$^{3}$, Alexander Mitsos\,$^{2}$ and Lars M. Blank\,$^{1}$}
+% Affiliations should be keyed to the author's name with superscript numbers and be listed as follows: Laboratory, Institute, Department, Organization, City, State abbreviation (USA, Canada, Australia), and Country (without detailed address information such as city zip codes or street names).
+% If one of the authors has a change of address, list the new address below the correspondence details using a superscript symbol and use the same symbol to indicate the author in the author list.
+\def\Address{$^{1}$iAMB \-- Institute of Applied Microbiology, ABBT, RWTH Aachen University, 52074 Aachen, Germany\\
+$^{2}$AVT \-- Process Systems Engineering, RWTH Aachen University, 52074 Aachen, Germany  \\
+$^{3}$Department of Chemical Engineering, Delft University of Technology, Van der Maasweg 9, Delft 2629 HZ, The Netherlands  
+}
+% The Corresponding Author should be marked with an asterisk
+% Provide the exact contact address (this time including street name and city zip code) and email of the corresponding author
+\def\corrAuthor{Ulf Liebal}
+
+\def\corrEmail{ulf.liebal@rwth-aachen.de}
+
+
+
+
+\begin{document}
+\onecolumn
+\firstpage{1}
+
+\title[Machine learning with promoter libraries]{Insight to gene expression from promoter libraries with the machine learning workflow \textit{Exp2Ipynb}}
+
+\author[\firstAuthorLast ]{\Authors} %This field will be automatically populated
+\address{} %This field will be automatically populated
+\correspondance{} %This field will be automatically populated
+
+\extraAuth{}% If there are more than 1 corresponding author, comment this line and uncomment the next one.
+%\extraAuth{corresponding Author2 \\ Laboratory X2, Institute X2, Department X2, Organization X2, Street X2, City X2 , State XX2 (only USA, Canada and Australia), Zip Code2, X2 Country X2, email2@uni2.edu}
+
+
+\maketitle
+
+
+\begin{abstract}
+
+%%% Leave the Abstract empty if your article does not require one, please see the Summary Table for full details.
+\section{}
+Metabolic engineering relies on modifying gene expression to regulate protein concentrations and reaction activities. The gene expression is controlled by the promoter sequence, and sequence libraries are used to scan expression activities and to identify correlations between sequence and activity. We introduce a computational workflow called \textit{Exp2Ipynb} to analyze promoter libraries maximizing information retrieval and promoter design with desired activity. We applied \textit{Exp2Ipynb} to seven prokaryotic expression libraries to identify optimal experimental design principles. The workflow is open source, available as Jupyter Notebooks and covers the steps to (i) generate a statistical overview to sequence and activity, (ii) train machine-learning algorithms, such as random forest, gradient boosting trees and support vector machines, for prediction and extraction of feature importance, (iii) evaluate the performance of the estimator, and (iv) to design new sequences with a desired activity using numerical optimization. The workflow can perform regression or classification on multiple promoter libraries, across species or reporter proteins. The most accurate predictions in the sample libraries were achieved when the promoters in the library were recognized by a single sigma factor and a unique reporter system. The prediction confidence mostly depends on sample size and sequence diversity, and we present a relationship to estimate their respective effects. The workflow can be adapted to process sequence libraries from other expression-related problems and increase insight to the growing application of high-throughput experiments, providing support for efficient strain engineering.
+
+\tiny
+ \keyFont{ \section{Keywords:} machine learning, gene expression, strain engineering, biotechnology, synthetic biology, Jupyter Notebook} %All article types: you may provide up to 8 keywords; at least 5 are mandatory.
+\end{abstract}
+
+\section{Introduction}
+
+Metabolic engineering aims at optimizing metabolite production by adjusting the activity of native and heterologous enzymes. A frequently manipulated factor of activity is the enzyme concentration, which can be regulated on transcriptional, translational, and post-translational levels. In bacteria, enzyme concentrations are mainly set at the transcriptional level \citep{Balakrishnan2021}. Among the most important transcriptional element is the promoter sequence. The promoter sequence is the primary target for metabolic engineering because the expression activity is largely controlled by the sequence and can be easily altered. Both the composition and regulation of expression by promoters have been intensively studied \citep{Kalisky2007, zaslaver2009invariant, Kochanowski2017}. For example, Rhodius and coworkers investigated the expression strength of 60 $\sigma^{\mathrm{E}}$ promoters and analyzed the impact of promoter boxes and upstream regulating elements on expression \citep{Rhodius2010,Rhodius2012}. A modular promoter system was developed by \cite{Mutalik2013}, that reduces interference from the sequence of the gene of interest, resulting in reproducible promoter activities. 
+
+Promoter libraries are routinely constructed to generate promoters with a wide range of activities \citep{Jensen1993, Alper2005, Hammer2006, Balzer2013, Kobbing2020} and machine learning has been applied for better understanding of transcription mechanisms and activity prediction based on sequence. For example, Meng \textit{et al.} analyzed 98 $\sigma^{\mathrm{70}}$ promoter sequences in \textit{E.\,coli} and fine-tuned heterologous expression with newly designed synthetic promoters \citep{Meng2013, Meng2017}. The machine learning analysis therein was based on artificial neural networks (ANN) \citep{Meng2013} and support vector machines (SVM) \citep{Meng2017}, and both approaches performed comparably. The same system with $\sigma^{\mathrm{70}}$ driven expression in \textit{E.\,coli} was tested by Zhao \textit{et al.} with over 3,500 promoter sequences \citep{Zhao2020} and analyzed using projection to latent spaces (PLS), tree methods (gradient boosting trees, GBT), and recurrent neural networks, wherein GBT performed best. In \textit{Bacillus\,subtilis} Liu \textit{et al.} employed a synthetic promoter library with 214 sequences to adjust pathway activity for metabolite overproduction \citep{liu2018construction} and used PLS for regression analysis. A promoter library with 80 sequences in \textit{Geobacillus\,thermoglucosidasius} was tested for both the expression of GFP and mOrange and trained on models of PLS and ANN \citep{Gilman2019}. Overall, the libraries were generated with a varying sample sizes from 60 to over 3,500 and enabled model-based sequence analysis and rational promoter development. 
+
+Promoter libraries are typically analyzed by individually developed scripts, a time consuming process which impedes direct comparison of performance measures. To unify the analysis and provide a platform suitable for easy reconfiguration, we developed a general workflow for promoter library analysis called \textit{Exp2Ipynb}. The \textit{Exp2Ipynb} workflow consists of a collection of Python Jupyter Notebooks (RRID:\verb:SCR_018413:) for statistical investigations, machine-learning, estimator performance evaluation, and sequence design by optimization of the estimator. We tested the workflow on an existing promoter library for $\sigma^{\mathrm{70}}$ in \textit{Pseudomonas putida} KT2440, expanded with new sequences. The results revealed limitations of one-factor-at-a-time experimental designs for machine learning. Subsequently, we used six published libraries to compare their composition and the resulting machine learning performance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Methods}
+\subsection{Data preparation and statistical analysis}  
+A configuration file stores variables with global use in each Notebook-assisted analysis. The data input is a comma-separated-value file (\textit{csv}) with at least three columns: (i) an identifier column, (ii) a sequence column, and (iii) an expression value column, with header names. Optional columns are expression values of the sequences in other organisms or with a different reporter system and the standard deviation with the replicate numbers. The sequence column only accepts DNA abbreviations (A, C, G, T) with an identical length for each sequence. The output file names and figure file types can be defined. The column names for data import are defined in a separate configuration file \textit{config.txt} and the notebook \textit{0-Workflow} guides through its construction. 
+
+The statistical analysis in the Notebook \textit{1-Statistical-Analysis.ipynb} provides an overview of the metrics with relevance for data exploration and model development. In addition to a single expression value, the standard deviation and replicate number can be provided. Optionally, outliers in the original data set can be removed from further analysis. Machine learning performance is improved if replicates are available and the workflow enables the re-generation of replicates based on mean and standard deviation. The replicates are calculated from Python \textit{numpy} (RRID:\verb:SCR_008633:) random normal function \citep{Harris2020} and are valid for normal-distributed data while adding a reasonable prediction bias.   
+
+The sequence diversity represents how different the sequences are from each other. It is calculated as the normalized sum of nucleotide differences relative to a reference sequence or among all sequences and ranges between 0 (identical) to 1 (each position differs). The reference sequence can be provided with the configuration file, or it is generated automatically by finding the most common nucleotide on each position. For large libraries, \textit{i.e.}, >1000 samples, the total pairwise distance is costly to compute and the reference sequence distance is performed by default. The position diversity informs about how many nucleotides have been sampled for each position. It is visualized with two bar plots: (i) the cumulative number of each nucleotide tested on each position, and (ii) the entropy ($H_i$) for any sequence position ($i$):
+\begin{equation}
+H_i = -\sum_{i=(A,C,G,T)} p_i \log_2 p_i\label{eq:01} %\vspace*{-10pt}
+\end{equation}
+where $p_i$ is the position-related nucleotide frequency. The expression statistics for all nucleotides and positions $\overline{Exp}$ informs how each nucleotide contributes to the expression:
+\begin{equation*}
+\overline{Exp} = \frac{\sum_{n=1}^{S}\left( \bordermatrix{~ & A & C & G & T \cr
+              1 & 0 & 1 & 0 & 0 \cr
+              \vdots & \vdots & \vdots & \vdots & \vdots\cr
+              R & 0 & 0 & 1 & 0\cr
+              }_n 
+              \cdot Exp_n \right)}
+              {S}
+\end{equation*}
+Each sequence is transformed into a one-hot encoding with the four nucleotides as columns (A, C, G, T) and the sequence as rows with the maximum sequence length $R$. This sample-sequence one-hot matrix is multiplied by the associated expression strength ($Exp_n$) and is used to calculate the mean (standard deviation) of expression at each position-nucleotide pair over all samples ($S$). The expression strength is visualized with a histogram and a scatter plot for cross-library expression.  
+
+
+\subsection{Machine learning training} 
+The workflow supports classification and regression. In regression, the expression values for sequences are quantitatively predicted but require high data quality (sufficient sample size and position entropy). Classification provides qualitative predictions (\textit{e.g.}, low-medium-high), with more reliable predictions even for small data sets. The implemented machine learning models are random forest (RF), gradient boosting trees (GB), and support vector machines (SVM). The input features are nucleotides on each position in one-hot encoding plus the overall sequence GC-content. The predicted target variable is the expression strength. The feature size depends on the sequence length, typically ranging between 40-100 nucleotides or 160-400 features. If a classification is chosen, the output is binned according to a parameter provided by the user ($Response\_Value$ in \textit{config.txt}). If $Response\_Value=1$, the original activity values are used; if the $Response\_Value=0$, the data is centered with zero mean and unit variance and for larger values, bins are generated as equal-sized buckets (\textit{python pandas} \textit{qcut}, RRID:\verb:SCR_018214:), and the bin label is used as the target prediction. The data is split into training and test set, with a default ratio of 9:1 and a grid search on the training set identifies the optimal hyper-parameter.
+
+Additional feature selection procedures were implemented to increase performance. During feature selection, the number of nucleotides that serve as features can be reduced to optimize training. Reasonable predictions rely on a sufficient variety of nucleotides tested at each position ($H_i$), and a cut-off can be chosen in the configuration file to exclude positions below a defined value of $H_i$. However, note that non-canonical nucleotides in conserved promoter (box)-regions can result in severe expression deficiencies. Thus, a low diversity can also reflect critical nucleotides associated with difficulties to sample experimentally.   
+
+\subsection{Machine learning performance}
+The performance evaluation provides metrics for correlating the experimental and predicted outcomes and informs about important features for tree-based methods. The performance evaluation is based on cross-validation with 9:1 data separation that jointly moves identical sequences (\textit{i.e.}, replicates) to test- or training- sets. Thus, the test sequences are unknown to the regressor. The performance evaluation is based on the R2- (regression) and weighted F1-score (classification) (and optionally Matthews correlation coefficient) for the training set and the test set. The prediction uncertainty metric is determined by the coefficient of variance of the mean R2 and F1 prediction of the cross-validated training set. The tree-based methods allow the extraction of feature importance and represent the contributions of each nucleotide-position and are visualized with Logo-plots \citep{Tareen2019}. Moreover, single decision trees can be exported.
+
+\subsection{Promoter design by optimization}
+The ability to design new promoters with desired activities is required for effective strain engineering. The predictors resulting from the machine-learning training are used to search promoters and expression with a genetic algorithm based on the Python framework DEAP \citep{Fortin2012}. A genetic optimization algorithm is used as it can be easily applied to a wide variety of machine learning models. %Notably, deterministic global methods can guarantee the identification of global solutions and have recently been applied to complex machine learning models \citep{Schweidtmann2019,Schweidtmann2020,Thebelt2020}.
+Sequence identification for a regressor is conducted with a search for the sequence with the closest expression. The classification requires that the predicted expression lies within the target expression class while the sequence distance to the reference sequences is minimized. The sequences already present in the library are excluded from the search. 
+
+\subsection{Experimental library construction}
+The following section describes the experiments conducted to expand an existing promoter library \citep{Kobbing2020} which was used to test the machine learning and experiments to test newly designed promoters from the associated estimator optimization. Construction of the single nucleotide polymorphism (SNP) library was based on the plasmid pBG14g as template with oligonucleotides containing single degenerate nucleotides inside the P14g promoter sequence \citep{Zobel2015,Kobbing2020}. The fragments and vector pBG were digested with \textit{Pac}I and \textit{Nco}I (New England Biolabs) at 37°C. Digested backbone and promoter containing PCR fragments were ligated with T4 ligase (New England Biolabs) at room temperature for 30 minutes. Transformation into chemically competent \textit{E.\,coli} PIR2 cells was done by heat shock \citep{Hanahan1983}. Plasmids containing different synthetic promoter sequences were sequenced (Eurofins Genomics) and genomically integrated into the \textit{att}Tn7 site of \textit{P.\,putida} KT2440 by mating \citep{Zobel2015}. For promoter characterization in \textit{P.\,putida} KT2440, cells were grown in minimal medium \citep{Hartmans1989}, with 20\,mM glucose as carbon source. The Biolector system (M2P Labs) measured optical density (620\,nm) and msfGFP (excitation wavelength 488\,nm, emission wavelength 520\,nm). Scattered light was correlated to OD600 with a dilution series of a stationary phase culture. Promoter activity reflects the slope of the function of fluorescence over OD600 at the beginning of the exponential phase. More detailed information is given in \cite{Kobbing2020}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Results}
+\subsection{Case studies}
+The workflow was first applied on a newly extended \textit{P.\,putida} KT2440 synthetic promoter library, followed by a cross-analysis of six published libraries. The study of our \textit{P.\,putida} library will show how the workflow can be used, and we will highlight shortcomings of the experimental design for machine-learning-driven research. In the cross-library comparison, we investigated how the different library parameters of sample size, diversity and feature number of the input sequences impact the prediction quality of expression strength. 
+
+% \begin{figure*}[!tpb]%figure1
+%     \includegraphics[width=.85\linewidth]{Figures/Pput-SampleDiversity.png}
+%     \caption{(A): Promoter sampling diversity of the complete data set for nucleotide variations on each sequence position, transcription starts at 0 and (B): mutual sequence distances. The promoter library is based on our previously published library \citep{Kobbing2020}, with additional sequences totaling 63 different promoters with mutations directly upstream of the transcription start site. Two positions (\mbox{-13,-18}) were not mutated resulting in 28 tested positions.}
+%     \label{Fig:PputSampDiv}
+% \end{figure*}
+
+\subsection{\textit{P. putida} single library analysis}
+We used the workflow to analyze a synthetic library in \textit{P.\,putida} KT2440 driven by $\sigma^{70}$-dependent promoters and measured with GFP published previously \citep{Kobbing2020} containing 55 unique promoter sequences, here expanded by eight new sequences with an overall sample size of the library of 63. The goal was to identify sequence features responsible for expression strength. Experimentally, the sequence diversity was generated by single nucleotide exchanges in 28 nucleotides upstream of the transcription start site. For the analysis, we used 40 nucleotides of the promoter as input and binned the expression activity into three approximately equal classes for the output. The sequences had low information content on most positions (Figure \ref{Fig:PputSampDiv} (A) and (B)), allowing only predictions of categorized expression values, a regression predicted not better than random (not shown).
+
+% \begin{table}[!t]
+%     \processtable{Classification quality report for random forest (RF), gradient boosting trees (GBT) and support vector machine (SVM). The training was performed with the same Train(56)-Test(7) division with cross-validation on the training set (10\% hold-out). Nucleotide-position feature selection based on entropy threshold (0.2\,bits) resulted in 15 positions, in addition to GC-content (input vector: $15\times4+1$). Only tree-based methods (RF, GBT) extract the feature importance (FI). \label{Tab:PputML}}
+%     {
+%     \begin{tabular}{@{}l|l|l|l@{}}
+%         \toprule
+%                         & RF           & GBT           & SVM \\\hline%\midrule
+%         Run time        & 144           & 927           & 111 \\\hline
+%         CV:F1-score     & 0.42$\pm$0.19 & 0.5$\pm$0.22 & 0.47$\pm$0.21\\\hline
+%         Train:F1-score  & 0.58          & 0.89          & 0.88 \\\hline
+%         Test:F1-score   & 0.62          & 0.46          & 0.14 \\\hline
+%         $GC$-content    & 2nd           & 1st           & N.A.\\\hline
+%         Top 3 FI        & $-35:T:0.24$  & $-34:T:0.08$  & N.A.\\
+%                         & $-34:T:0.10$  & $-35:A:0.05$  & N.A.\\
+%                         & $-35:A:0.10$  & $-14:G:0.05$  & N.A.\\\botrule
+%     \end{tabular}
+%     }
+%     {} % Footnotes
+% \end{table}
+
+A classification estimator can predict the approximate magnitude of expression. A reasonable estimation can only be performed on features with sufficient information content and positions with a higher entropy than 0.2\,bits were included in the training. Figure \ref{Fig:PputSampDiv} (A) shows the entropy of the complete data set, and because the cut-off is applied to the training subset, the following positions are additionally neglected (\mbox{-6,-15-20,-22,-26}). Decreasing the entropy threshold did not affect the performance (not shown). The classification details are given in Table \ref{Tab:PputML}, and the high F1-score variation indicates that the low nucleotide redundancy on each position affected sample separation during cross-validation. The detailed prediction results of the training and test set are shown in Figure \ref{Fig:PputConfMatr} (A). The GC-content is among the most important features, probably because it has the highest entropy of all features (1.2\,bits). Along with the GC-content, critical features were the positions –35 and –34, corresponding to the fact that the -35-box is the site of transcription factor binding \citep{Paget2015} (Figure \ref{Fig:PputConfMatr} (B)). New sequences with defined expression activity were identified. Sequences with close relation to the reference sequence were chosen, because the data used for training itself has a low sequence diversity (Figure \ref{Fig:PputSampDiv}). Three promoters were suggested by the optimization procedure, two with low expression and one with high expression and were experimentally tested (see Table \ref{Tab:PputNew}). While the newly designed promoters with low activity could be validated, the designed promoter with a predicted high activity showed a medium activity experimentally.
+
+
+% \begin{figure*}[!tpb]
+%     \includegraphics[width=.85\linewidth]{Figures/2103_Pput-ConfMat.png}
+%     \caption{(A): Confusion matrix showing classification quality for training (n=56) and test set (n=7). The classification labels are 0: low (expression 0.2 - 16.6), 1: medium (16.6 - 24.8), 2: high (24.8 - 35.2)(\citep{Kobbing2020}). (B): Sequence logo of positions used by the random forest to predict expression activity class. The -35 and -10 box positions dominated the feature importance.}
+%     \label{Fig:PputConfMatr}
+% \end{figure*}
+
+% \begin{table}[!t]
+%     \processtable{Performance of newly designed promoters in comparison to reference promoters. The reference promoter is shown with the expression measured from the original data set and after the re-evaluation experiment. \label{Tab:PputNew}}
+%     {
+%     \begin{tabular}{@{}l|l|l|l@{}}
+%         \toprule
+%         ID              & Seq.Diff.     & Prediction     & Experiment \\\hline%\midrule
+%         Ref:mod4\_1      & GGTATAAT      & $9\pm2$       & $6.5\pm0.3$\\\hline
+%         pred:0-1        & GGTA\textbf{C}AAT      & $0.25-16.5$   & $7.1\pm0.9$\\
+%         pred:0-2        & GGTAT\textbf{T}AT      & $0.25-16.5$   & $9.7\pm2.5$\\\hline
+%         % Ref:SPL14g\_14\_g& GGTATAAT     & $29$          & $26\pm1.5$ \\
+%         pred:2-1        & \textbf{C}GTATAAT      & $25-35$       & $18.3\pm1.7$\\
+%         \botrule
+%     \end{tabular}
+%     }
+%     {} % Footnotes
+% \end{table}
+
+
+\subsection{Cross-library analysis}
+In the following, six published bacterial promoter libraries were analyzed to highlight the effect of the library design on the estimation quality. The data is available online in the \textit{Exp2Ipynb} package at GitHub. The libraries were measured in \textit{E.\,coli}, \textit{Geobacillus thermoglucosidasius}, and \textit{B.\,subtilis} and were targeted to specific or unknown sigma factors. All libraries differ in terms of combinations of library sample size, tested sequence length and sequence diversity (Table \ref{Tab:LibrComp}). 
+
+% \begin{table}[!t]
+%     \processtable{Details of the six published libraries used to compare estimation quality in response to the experimental design. The columns \textit{n} represent total sample size, \textit{Feat.} the size of the input vector, \textit{Avg.Seq.Distance} the average distance of all sequences to a reference sequence, composed of the most common nucleotide at each position. A comprehensive table with numerical values of Figure \ref{Fig:CompLibraryAnal} in the supplementary data. Multiple transcription factors are responsible for gene expression in the data set of \cite{Gilman2019}, hence is not applicable (\textit{N.A.}).\label{Tab:LibrComp}}
+%     {
+%     \begin{tabular}{@{}l|l|l|l|l|l|l@{}}
+%         \toprule
+%         Reference   &Organism   & Transcr.  &Reporter   &n    &Feat. & Avg.Seq.\\
+%                     &           & Factor    &           &           &         & Distance\\\hline
+%         a:This Work & \textit{P.\,putida} & $\sigma^{70}$& GFP & 63 & 61 & 0.06\\\hline
+%         b:Rhodius \textit{et al.}&\textit{E.\,coli} & $\sigma^{\mathrm{E}}$ & various & 59 & 121 & 0.61\\\hline
+%         c:Meng \textit{et al.}&\textit{E.\,coli} & $\sigma^{70}$ & GFP & 98 & 709 & 0.61\\\hline
+%         d:Zhao \textit{et al.}&\textit{E.\,coli} & $\sigma^{\mathrm{E}}$ & GFP & 3543 & 285 & 0.09\\\hline
+%         e:Gilman \textit{et al.}&\textit{G.\,therm.} & N.A. & GFP & 81 & 397 & 0.69\\\hline
+%         f:Gilman \textit{et al.}&\textit{G.\,therm.} & N.A. & mOrange & 81 & 397 & 0.69\\\hline
+%         g:Liu \textit{et al.}&\textit{B.\,subtilis} & $\sigma^{\mathrm{A}}$ & GFP & 206 & 105 & 0.35\\\hline
+%         h:Meng \textit{et al.}&\textit{E.\,coli} & $\sigma^{70}$ & GFP & 84 & 133 & 0.61\\\hline
+%         i:Meng \textit{et al.}&\textit{E.\,coli} & $\sigma^{70}$ & GFP & 84 & 129 & 0.61\\\hline
+%         k:Zhao \textit{et al.}&\textit{E.\,coli} & $\sigma^{\mathrm{E}}$ & GFP & 896 & 161 & 0.09\\
+%         \botrule
+%     \end{tabular}
+%     }
+%     {} % Footnotes
+% \end{table}
+
+The analysis was based on a classification task with a random forest and three classes: low (\textit{1}), medium (\textit{2}), and high expression (\textit{3}). The original data of the promoter libraries were used with minor corrections regarding sequence length homogenization. For quality assessment, we generated three synthetic data sets based on partitioned sequence regions from \cite{Meng2013} and \cite{Zhao2020}. The original sequence from \cite{Meng2013}, is 224 nucleotides (nt) long, and we extracted the starting 40\,nt (\textit{h}) and last 40\,nt (\textit{i}), assuming that few positions in the new sequences influence expression. \cite{Zhao2020}, tested 113\,nt ranging from upstream regulating elements down to the coding sequence. Again, the first 40\,nt (\textit{k}) were extracted, corresponding to the upstream regulating element. Three values are essential for the analysis of promoter libraries: (i) the fidelity of gene expression prediction, computed by the F1-score (see methods), (ii) the confidence of the prediction, computed by the coefficient of variation, and (iii) critical sequence features for expression, computed by the feature importance of random forest and gradient boosting strategies. 
+
+% \begin{figure*}[!tpb]
+%     \includegraphics[width=.85\linewidth]{Figures/CompAnalysisLibraries.png}
+%     \caption{Comparison of library properties on classification quality parameters for an estimation using RF. The estimations were performed on the training set of each library with 9:1 cross-validation. The seven full length promoter libraries are listed in Table \ref{Tab:LibrComp}. Moreover, sub-sequences of 40\,nt were extracted from the promoter start (\textit{h}) and end (\textit{i}) of \cite{Meng2013}(\textit{c}) and start (\textit{k}) of \cite{Zhao2020}(\textit{d}). F1-score (A) and the sum of the top three feature importance values (B) in response to feature amount. The coefficient of variation of the F1-scores in response to sequence diversity (C) and amount of training samples (D). Full table with numerical values in the supplementary data.}
+%     \label{Fig:CompLibraryAnal}
+% \end{figure*}
+
+The prediction qualities, evaluated by the F1-score, ranged between 0.3-0.6. The promoter library with more than 3,500 samples achieved best predictive quality (F1-score) and confidence (coefficient of variation of F1-score) (Figure \ref{Fig:CompLibraryAnal}, (A), library \textit{d}). Higher sample size was associated with lower sequence diversity and consequently better prediction confidence, with coefficient of variations below 0.2 (\textit{d}, \textit{g}). Notably, the F1-score was independent of the number of tested input features (Figure \ref{Fig:CompLibraryAnal} (A)). The effect of the training sample size on the coefficient of variation is hyperbolic decreasing (Figure \ref{Fig:CompLibraryAnal} (C)): below 200 samples represented by library \textit{g}, the coefficient of variation rises, thus decreasing prediction confidence. Two scenarios are visible in Figure \ref{Fig:CompLibraryAnal} (C), \textit{a} and \textit{c} display already a very low sequence diversity and for improving performance the sequence diversity should be increased. In contrast, libraries \textit{b}, \textit{e}, and \textit{f} are diverse, and estimation performance would benefit by increasing the sample size even with related sequences. An interesting piece of information is the feature importance, for features that correlate with expression activity. Figure \ref{Fig:CompLibraryAnal} (B) indicates how the number of features affects the sum of the three top important features derived from the RF. The top-three feature importance sum decreases linearly with increasing numbers of features. However, for library \textit{c}, the top three nucleotide positions are much more predictive than expected, assuming that more features lead to a larger distribution of feature importances and thus less proportional share for the top three features available. 
+
+Using sequence subsets to test the effect of the number of features confirmed lower importance of feature numbers compared to sequence diversity and sample size. To test sequence subsets, we chose the libraries from \cite{Meng2013} and \cite{Zhao2020} because they report a high feature number with low sequence diversity. Sub-sequences from \cite{Meng2013} were extracted with 40\,nt sequences at the start (\textit{h}) and end (\textit{i}) because these contain features with low importance. The rationale to use the starting 40\,nt from \cite{Zhao2020} (\textit{k}) is that they included the upstream regulating element and are essential expression features. The sequence extraction reduces the sample size because more redundant sequences are generated, increasing the nucleotide diversity. Figure 3 shows that the partitioned data set \textit{k} \citep{Zhao2020} maintained the prediction confidence from the original data set: the F1-CoV and top three feature contribution increased proportionally to the original data (Figure \ref{Fig:CompLibraryAnal} B, C, and D). This proportional movement was not displayed by the extracted sequences (\textit{h}, \textit{i}) from \cite{Meng2013}. Thus, sequence positions impacting expression were identified in the upstream regulating elements of \cite{Zhao2020}, but not in the first and last 40\,nt of the sequences of \cite{Meng2013}. The synthetic data set \textit{k} is in line with the sample size correlation to the coefficient of variance of the libraries \textit{d} and \textit{g}. These results indicate that sample size in the range of 200 to 3,500 is not critical for the coefficient of variance.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Discussion}
+Synthetic promoter libraries are increasingly constructed to facilitate promoter selection with defined activities. The \textit{Exp2Ipynb} workflow supports the analysis of promoter libraries to identify the sequence information that determines expression strength. The identification is based on statistical analysis of the average nucleotide-position associated expression, and the training of different machine-learning models. Moreover, more complex libraries with multiple readouts, like two reporter proteins, transcript, protein level, or cross-host expression can be analyzed. The workflow facilitates data exploration, regressor training and performance evaluation, and testing of novel sequences within the DNA sequence exploration space. The implementation in a Jupyter notebook facilitates rapid implementation and the low-level scripting allows for direct adaptation of the workflow to specific needs. In the following, we summarize the applicability of \textit{Exp2Ipynb} to a \textit{P.\,putida} promoter library with sub-optimal data quality, followed by a discussion of data properties for optimal sequence analysis.
+
+We analyzed a promoter expression library in \textit{P.\,putida} KT2440 previously published \citep{Kobbing2020} and amended it with additional data points and used the classification model to design new promoters with defined activity. The different samples in the library were generated based on a one-factor-at-a-time approach to identify nucleotide-sequence effects on expression \citep{Czitrom1999}. Our results of the strong impact of the positions –35 and –34 and the lower impact of the last half of the -10 box (TATAAT, -10, -9, -8) confirmed results of the original article (Köbbing \textit{et al.}, 2020, Figure 4 therein). However, we failed to observe the strong effect of the first part of the -10 box (TATAAT, -11) because the position was insufficiently sampled below the entropy cut-off and was neglected in the analysis. We used the classifier to apply a genetic algorithm and find sequences within a defined expression range and we confirmed their expression strength experimentally. Thus, even data sets with low sample size and sequence diversity allow for predicting expression ranges for biotechnological use.
+
+Sample size and sequence diversity were the main factors to affect prediction confidence (coefficient of variation) while the number of feature was less critical. A high sequence diversity resulted in lower prediction confidence, and increasing the sample size can help to reduce diversity and increase prediction confidence. Two libraries in the collection were limited by sample size (\textit{a}+\textit{c}), whereas five libraries were limited by sequence diversity (\textit{b}, \textit{d}, \textit{e}, \textit{f}). We found that 100 samples still resulted in a high uncertainty for sequences with an average of $20\%$ nucleotide difference (\textit{a}, \textit{c}), whereas 800 samples were sufficient (\textit{k}). With higher nucleotide differences of $35\%$, 200 samples provided reasonable prediction qualities (\textit{g}). Libraries including multiple sigma factors (\textit{e}, \textit{f})\citep{Gilman2019} resulted in lower prediction qualities, which parallels studies on heterogenous data in \textit{E.\,coli} \citep{Cambray2018} and yeast \citep{Liya2021}. More libraries are necessary to narrow the required sample size over the whole sequence diversity spectrum.  
+
+Our prediction quality (F1-score) performs poorly over the different libraries. Some studies have identified much stronger regression correlation coefficients \citep{Rhodius2010,Meng2013,Meng2017}. These were based on optimized train-test set partitions and do not report cross-validation statistics. Gilman \textit{et al.} calculate a stronger correlation for their model, but when the authors tested new data, the prediction qualities were similar to those we observed. Also, the convolutional neural net trained with 500,000 sequences by \cite{Cuperus2017}, achieves correlation coefficients of 0.62. Additional feature engineering can be used to increase predictability: GC-moving window, secondary structure for UTR \citep{Cuperus2017}. Multiple factors control gene expression of which a number is apparently not stored in the sequence alone.  
+
+The \textit{Exp2Ipynb} workflow includes training of RF, GBT and SVM, whereas neural-networks are not explicitly implemented. In the original articles of the libraries tested here, SVM and GBT performed comparably or outperformed neural network based approaches \citep{Meng2017, Zhao2020}. Most promoter libraries have samples sizes on which neural networks are not expected to outperform classical methods. The performance of each machine learning model depends on the underlying data structure, and the most suitable method has to be identified individually \citep{wolpert1997no}. It is possible to include additional methods via the \textit{python} interface easily. 
+
+So far, the analysis of promoter libraries was conducted with scripts tailored to the data, obfuscating reproducibility and interpretability. The \textit{Exp2Ipynb} workflow contributes to harmonize analytical workflows and enables an easy start for investigating newly generated promoter libraries. Other general machine-learning toolboxes exist, \textit{e.g.}, \textit{tpot}, \textit{GAMA}, or \textit{H2O} \citep{Truong2019}, in addition to tools more oriented towards biological data analysis, \textit{e.g.}, \textit{JADBIO} \citep{Tsamardinos2020}. The advantage of the \textit{Exp2Ipynb} is to be general enough to be used across different data sets in expression studies but remaining domain-specific to facilitate simple data integration. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \section{Conclusion}
+We present a workflow called \textit{Exp2Ipynb} for machine-learning supported analysis of gene-expression libraries. We applied \textit{Exp2Ipynb} in a proof-of-concept on a \textit{P.\,putida} KT2440 promoter library for use in metabolic engineering. In this context, the workflow allowed identifying critical sequence features for expression and predicted new sequences with defined activity, tested retrospectively. Moreover, six published prokaryotic gene expression libraries were tested and we observed a correlation between sample size and sequence diversity for successful analysis. The workflow supports deep analysis of promoter libraries and allows users to adapt it to personal needs. Thus data quality assessments are improved and research is accelerated.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Conflict of Interest Statement}
+%All financial, commercial or other relationships that might be perceived by the academic community as representing a potential conflict of interest must be disclosed. If no such relationship exists, authors will be asked to confirm the following statement: 
+
+The authors declare that the research was conducted in the absence of any commercial or financial relationships that could be construed as a potential conflict of interest.
+
+\section*{Author Contributions}
+UWL developed \textit{Exp2Ipynb} conducted the computational analysis and wrote the bulk of the manuscript. SK performed the experiments to generate the promoter library and expression tests in \textit{P. putida} and contributed to the analysis. LN, AMS developed and tested the optimization procedure. LMB reviewed preliminary results and contributed suggestions to improve the methodology. LMB, AM provided guidance and oversight. All authors contributed to revising the manuscript, and approved the submitted version.
+% inspired by 10.3389/fmicb.2021.614355
+
+\section*{Funding}
+UWL received funding by the Excellence Initiative of the German federal and state governments ((DE-82)EXS-PF-PFSDS015). This work is funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) under Germany’s Excellence Strategy—Exzellenzcluster 2186, The Fuel Science Center ID: 390919832. AMS is supported by the TU Delft AI Labs Programme.
+
+\section*{Acknowledgments}
+The authors thank Salome E. Nies and Dario Neves for promoter library data during initial tests. The authors are grateful for discussions with Birgitta E. Ebert, Tobias B. Alter and Bastian Kister.
+
+\section*{Supplemental Data}
+The Supplementary Material for this article can be found online including sequence and expression for the data presented in this article as well as a Jupyter Notebook to reproduce figures.
+% \href{http://home.frontiersin.org/about/author-guidelines#SupplementaryMaterial}{Supplementary Material} should be uploaded separately on submission, if there are Supplementary Figures, please include the caption in the same file as the figure. LaTeX Supplementary Material templates can be found in the Frontiers LaTeX folder.
+
+\section*{Data Availability Statement}
+The Jupyter Notebook of Exp2Ipynb with the data in this article is freely available at GitHub: \href{https://github.com/iAMB-RWTH-Aachen/Exp2Ipynb}{https://github.com/iAMB-RWTH-Aachen/Exp2Ipynb} licensed under GPLv3.
+
+\bibliographystyle{frontiersinSCNS_ENG_HUMS} % for Science, Engineering and Humanities and Social Sciences articles, for Humanities and Social Sciences articles please include page numbers in the in-text citations
+%\bibliographystyle{frontiersinHLTH&FPHY} % for Health, Physics and Mathematics articles
+\bibliography{2103_Exp2Ipynb}
+
+%%% Make sure to upload the bib file along with the tex file and PDF
+%%% Please see the test.bib file for some examples of references
+\newpage
+\section*{Figure captions}
+
+%%% Please be aware that for original research articles we only permit a combined number of 15 figures and tables, one figure with multiple subfigures will count as only one figure.
+%%% Use this if adding the figures directly in the mansucript, if so, please remember to also upload the files when submitting your article
+%%% There is no need for adding the file termination, as long as you indicate where the file is saved. In the examples below the files (logo1.eps and logos.eps) are in the Frontiers LaTeX folder
+%%% If using *.tif files convert them to .jpg or .png
+%%%  NB logo1.eps is required in the path in order to correctly compile front page header %%%
+\begin{figure*}[h!]%figure1
+    \begin{center}
+        \includegraphics[width=.85\linewidth]{Figures/Pput-SampleDiversity.png}
+    \end{center}
+    \caption{(A): Promoter sampling diversity of the complete data set for nucleotide variations on each sequence position, transcription starts at 0 and (B): mutual sequence distances. The promoter library is based on our previously published library \citep{Kobbing2020}, with additional sequences totaling 63 different promoters with mutations directly upstream of the transcription start site. Two positions (\mbox{-13,-18}) were not mutated resulting in 28 tested positions.}
+    \label{Fig:PputSampDiv}
+\end{figure*}
+
+\newpage
+\begin{figure*}[h!]
+    \begin{center}
+        \includegraphics[width=.85\linewidth]{Figures/2103_Pput-ConfMat.png}
+    \end{center}
+    \caption{(A): Confusion matrix showing classification quality for training (n=56) and test set (n=7). The classification labels are 0: low (expression 0.2 - 16.6), 1: medium (16.6 - 24.8), 2: high (24.8 - 35.2)(\citep{Kobbing2020}). (B): Sequence logo of positions used by the random forest to predict expression activity class. The -35 and -10 box positions dominated the feature importance.}
+    \label{Fig:PputConfMatr}
+\end{figure*}
+
+\newpage
+\begin{figure*}[h!]
+    \begin{center}
+        \includegraphics[width=.85\linewidth]{Figures/CompAnalysisLibraries.png}
+    \end{center}
+    \caption{Comparison of library properties on classification quality parameters for an estimation using RF. The estimations were performed on the training set of each library with 9:1 cross-validation. The seven full length promoter libraries are listed in Table \ref{Tab:LibrComp}. Moreover, sub-sequences of 40\,nt were extracted from the promoter start (\textit{h}) and end (\textit{i}) of \cite{Meng2013}(\textit{c}) and start (\textit{k}) of \cite{Zhao2020}(\textit{d}). F1-score (A) and the sum of the top three feature importance values (B) in response to feature amount. The coefficient of variation of the F1-scores in response to sequence diversity (C) and amount of training samples (D). Full table with numerical values in the supplementary data.}
+    \label{Fig:CompLibraryAnal}
+\end{figure*}
+
+%%% If you are submitting a figure with subfigures please combine these into one image file with part labels integrated.
+%%% If you don't add the figures in the LaTeX files, please upload them when submitting the article.
+%%% Frontiers will add the figures at the end of the provisional pdf automatically
+%%% The use of LaTeX coding to draw Diagrams/Figures/Structures should be avoided. They should be external callouts including graphics.
+
+\newpage
+\section*{Table captions}
+\begin{table}[h!]
+    \caption{Classification quality report for random forest (RF), gradient boosting trees (GBT) and support vector machine (SVM). The training was performed with the same Train(56)-Test(7) division with cross-validation on the training set (10\% hold-out). Nucleotide-position feature selection based on entropy threshold (0.2\,bits) resulted in 15 positions, in addition to GC-content (input vector: $15\times4+1$). Only tree-based methods (RF, GBT) extract the feature importance (FI). \label{Tab:PputML}}
+    {
+    \begin{tabular}{@{}l|l|l|l@{}}
+        \toprule
+                        & RF           & GBT           & SVM \\\hline%\midrule
+        Run time (s)    & 144           & 927           & 111 \\\hline
+        CV:F1-score     & 0.42$\pm$0.19 & 0.5$\pm$0.22 & 0.47$\pm$0.21\\\hline
+        Train:F1-score  & 0.58          & 0.89          & 0.88 \\\hline
+        Test:F1-score   & 0.62          & 0.46          & 0.14 \\\hline
+        $GC$-content    & 2nd           & 1st           & N.A.\\\hline
+        Top 3 FI        & $-35:T:0.24$  & $-34:T:0.08$  & N.A.\\
+                        & $-34:T:0.10$  & $-35:A:0.05$  & N.A.\\
+                        & $-35:A:0.10$  & $-14:G:0.05$  & N.A.\\\botrule
+    \end{tabular}
+    }
+    {} % Footnotes
+\end{table}
+
+\newpage
+\begin{table}[h!]
+    \caption{Performance of newly designed promoters in comparison to reference promoters. The reference promoter is shown with the expression measured from the original data set and after the re-evaluation experiment. \label{Tab:PputNew}}
+    {
+    \begin{tabular}{@{}l|l|l|l@{}}
+        \toprule
+        ID              & Seq.Diff.     & Prediction     & Experiment \\\hline%\midrule
+        Ref:mod4\_1      & GGTATAAT      & $9\pm2$       & $6.5\pm0.3$\\\hline
+        pred:0-1        & GGTA\textbf{C}AAT      & $0.25-16.5$   & $7.1\pm0.9$\\
+        pred:0-2        & GGTAT\textbf{T}AT      & $0.25-16.5$   & $9.7\pm2.5$\\\hline
+        % Ref:SPL14g\_14\_g& GGTATAAT     & $29$          & $26\pm1.5$ \\
+        pred:2-1        & \textbf{C}GTATAAT      & $25-35$       & $18.3\pm1.7$\\
+        \botrule
+    \end{tabular}
+    }
+    {} % Footnotes
+\end{table}
+
+\newpage
+\begin{table}[h!]
+    \caption{Details of the six published libraries used to compare estimation quality in response to the experimental design. The columns \textit{n} represent total sample size, \textit{Feat.} the size of the input vector, \textit{Avg.Seq.Distance} the average distance of all sequences to a reference sequence, composed of the most common nucleotide at each position. A comprehensive table with numerical values of Figure \ref{Fig:CompLibraryAnal} in the supplementary data. Multiple transcription factors are responsible for gene expression in the data set of \cite{Gilman2019}, hence is not applicable (\textit{N.A.}).\label{Tab:LibrComp}}
+    {
+    \begin{tabular}{@{}l|l|l|l|l|l|l@{}}
+        \toprule
+        Reference   &Organism   & Transcr.  &Reporter   &n    &Feat. & Avg.Seq.\\
+                    &           & Factor    &           &           &         & Distance\\\hline
+        a:This Work & \textit{P.\,putida} & $\sigma^{70}$& GFP & 63 & 61 & 0.06\\\hline
+        b:Rhodius \textit{et al.}&\textit{E.\,coli} & $\sigma^{\mathrm{E}}$ & various & 59 & 121 & 0.61\\\hline
+        c:Meng \textit{et al.}&\textit{E.\,coli} & $\sigma^{70}$ & GFP & 98 & 709 & 0.61\\\hline
+        d:Zhao \textit{et al.}&\textit{E.\,coli} & $\sigma^{\mathrm{E}}$ & GFP & 3543 & 285 & 0.09\\\hline
+        e:Gilman \textit{et al.}&\textit{G.\,therm.} & N.A. & GFP & 81 & 397 & 0.69\\\hline
+        f:Gilman \textit{et al.}&\textit{G.\,therm.} & N.A. & mOrange & 81 & 397 & 0.69\\\hline
+        g:Liu \textit{et al.}&\textit{B.\,subtilis} & $\sigma^{\mathrm{A}}$ & GFP & 206 & 105 & 0.35\\\hline
+        h:Meng \textit{et al.}&\textit{E.\,coli} & $\sigma^{70}$ & GFP & 84 & 133 & 0.61\\\hline
+        i:Meng \textit{et al.}&\textit{E.\,coli} & $\sigma^{70}$ & GFP & 84 & 129 & 0.61\\\hline
+        k:Zhao \textit{et al.}&\textit{E.\,coli} & $\sigma^{\mathrm{E}}$ & GFP & 896 & 161 & 0.09\\
+        \botrule
+    \end{tabular}
+    }
+    {} % Footnotes
+\end{table}
+
+
+\end{document}
+
+
+
+% suggested reviewer
+% Ioannis Tsamardinos
+% tsamard.it@gmail.com
+% Department of Computer Science
+% University of Crete, 
+% Heraklion, Greece
+%
+% Yu  Deng
+% dengyu@jiangnan.edu.cn
+% Jiangnan University
+% Jiangsu, China
+%
+% Xiaodong Cai
+% x.cai@miami.edu
+% University of Miami
+% Coral Gables, Florida,United States
+%
+% Rob Lavigne
+% rob.lavigne@kuleuven.be
+% KU Leuven
+% Leuven, Belgium
