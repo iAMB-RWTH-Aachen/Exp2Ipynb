@@ -9,6 +9,22 @@ License: see LICENSE file<br>
 
 The Exp2Ipynb workflow facilitates analysis of promoter libraries using Jupyter Notebooks. To use it, clone the repository.
 
+## Installation
+To use the Exp2Ipynb workflow, a Python environment is required. For Windows, Apple and Linus systems, Anaconda is a suitable Python program. To run Jupyter notebooks, the Jupyter environment needs to be available.
+
+Requirements:
+- [Python](https://www.anaconda.com/products/individual-d)
+- [Jupyter](https://jupyterlab.readthedocs.io/en/stable/getting_started/installation.html)
+- More detailed requirements can be found in the [requirements.txt](./requirements.txt) file
+
+Install Exp2Ipynb by downloading or cloning the GitHub project.
+
+`git clone https://github.com/iAMB-RWTH-Aachen/Exp2Ipynb.git`
+
+Once installed locally, navigate into the `Exp2Ipynb` and start the Jupyter environment (in Linux command line `jupyter lab` or `jupyter notebook`, in Windows-Anaconda click the Jupyter Lab icon). In the Jupyter environment, navigate into the `Analysis` folder and open the Notebooks files.
+
+## Overview
+
 The analysis is distributed in different notebooks in the sub-folder `Analysis`:
 
 | *.ipynb | Description |
