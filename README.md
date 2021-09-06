@@ -17,7 +17,7 @@ Requirements:
 - [Jupyter](https://jupyterlab.readthedocs.io/en/stable/getting_started/installation.html)
 - More detailed requirements can be found in the [requirements.txt](./requirements.txt) file
 
-Install Exp2Ipynb by downloading or cloning the GitHub project.
+Install Exp2Ipynb by downloading or cloning the GitHub project. For example, in the git command line type: 
 
 `git clone https://github.com/iAMB-RWTH-Aachen/Exp2Ipynb.git`
 
