@@ -24,6 +24,7 @@
 %\setcitestyle{square} % for Physics and Applied Mathematics and Statistics articles
 \usepackage{url,hyperref,lineno,microtype,subcaption}
 \usepackage[onehalfspacing]{setspace}
+\usepackage{color,soul} 
 
 \linenumbers
 
@@ -95,33 +96,33 @@ A configuration file stores variables with global use in each Notebook-assisted 
 
 The statistical analysis in the Notebook \textit{1-Statistical-Analysis.ipynb} provides an overview of the metrics with relevance for data exploration and model development. In addition to a single expression value, the standard deviation and replicate number can be provided. Optionally, outliers in the original data set can be removed from further analysis. Machine learning performance is improved if replicates are available and the workflow enables the re-generation of replicates based on mean and standard deviation. The replicates are calculated from Python \textit{numpy} (RRID:\verb:SCR_008633:) random normal function \citep{Harris2020} and are valid for normal-distributed data while adding a reasonable prediction bias.   
 
-The sequence diversity represents how different the sequences are from each other. It is calculated as the normalized sum of nucleotide differences relative to a reference sequence or among all sequences and ranges between 0 (identical) to 1 (each position differs). The reference sequence can be provided with the configuration file, or it is generated automatically by finding the most common nucleotide on each position. For large libraries, \textit{i.e.}, >1000 samples, the total pairwise distance is costly to compute and the reference sequence distance is performed by default. The position diversity informs about how many nucleotides have been sampled for each position. It is visualized with two bar plots: (i) the cumulative number of each nucleotide tested on each position, and (ii) the entropy ($H_i$) for any sequence position ($i$):
+The sequence diversity represents how different the sequences are from each other. It is calculated as the normalized sum of nucleotide differences relative to a reference sequence or among all sequences and ranges between 0 (identical) to 1 (each position differs). The reference sequence can be provided with the configuration file, or it is generated automatically by finding the most common nucleotide on each position. For large libraries, \textit{i.e.}, $>$1000 samples, the total pairwise distance is costly to compute and the reference sequence distance is performed by default. The position diversity informs about how many nucleotides have been sampled for each position. It is visualized with two bar plots: (i) the cumulative number of each nucleotide tested on each position, and (ii) the entropy ($H_i$) for any sequence position ($i$):
 \begin{equation}
 H_i = -\sum_{i=(A,C,G,T)} p_i \log_2 p_i\label{eq:01} %\vspace*{-10pt}
 \end{equation}
-where $p_i$ is the position-related nucleotide frequency. The expression statistics for all nucleotides and positions $\overline{Exp}$ informs how each nucleotide contributes to the expression:
-\begin{equation*}
-\overline{Exp} = \frac{\sum_{n=1}^{S}\left( \bordermatrix{~ & A & C & G & T \cr
-              1 & 0 & 1 & 0 & 0 \cr
-              \vdots & \vdots & \vdots & \vdots & \vdots\cr
-              R & 0 & 0 & 1 & 0\cr
-              }_n 
-              \cdot Exp_n \right)}
-              {S}
-\end{equation*}
+where $p_i$ is the position-related nucleotide frequency. The expression statistics for all nucleotides and positions $\overline{Exp}$ informs how each nucleotide contributes to the expression and its calculation is shown shematically in Figure \ref{Fig:AvgPosExp}.
+% \begin{equation*}
+% \overline{Exp} = \frac{\sum_{n=1}^{S}\left( \bordermatrix{~ & A & C & G & T \cr
+%               1 & 0 & 1 & 0 & 0 \cr
+%               \vdots & \vdots & \vdots & \vdots & \vdots\cr
+%               R & 0 & 0 & 1 & 0\cr
+%               }_n 
+%               \cdot Exp_n \right)}
+%               {S}
+% \end{equation*}
 Each sequence is transformed into a one-hot encoding with the four nucleotides as columns (A, C, G, T) and the sequence as rows with the maximum sequence length $R$. This sample-sequence one-hot matrix is multiplied by the associated expression strength ($Exp_n$) and is used to calculate the mean (standard deviation) of expression at each position-nucleotide pair over all samples ($S$). The expression strength is visualized with a histogram and a scatter plot for cross-library expression.  
 
 
 \subsection{Machine learning training} 
-The workflow supports classification and regression. In regression, the expression values for sequences are quantitatively predicted but require high data quality (sufficient sample size and position entropy). Classification provides qualitative predictions (\textit{e.g.}, low-medium-high), with more reliable predictions even for small data sets. The implemented machine learning models are random forest (RF), gradient boosting trees (GB), and support vector machines (SVM). The input features are nucleotides on each position in one-hot encoding plus the overall sequence GC-content. The predicted target variable is the expression strength. The feature size depends on the sequence length, typically ranging between 40-100 nucleotides or 160-400 features. If a classification is chosen, the output is binned according to a parameter provided by the user ($Response\_Value$ in \textit{config.txt}). If $Response\_Value=1$, the original activity values are used; if the $Response\_Value=0$, the data is centered with zero mean and unit variance and for larger values, bins are generated as equal-sized buckets (\textit{python pandas} \textit{qcut}, RRID:\verb:SCR_018214:), and the bin label is used as the target prediction. The data is split into training and test set, with a default ratio of 9:1 and a grid search on the training set identifies the optimal hyper-parameter.
+The workflow supports classification and regression. In regression, the expression values for sequences are quantitatively predicted but require high data quality (sufficient sample size and position entropy). Classification provides qualitative predictions (\textit{e.g.}, low-medium-high), with more reliable predictions even for small data sets. The implemented machine learning models are random forest (RF), gradient boosting trees (GB), and support vector machines (SVM). The input features are nucleotides on each position in one-hot encoding plus the overall sequence GC-content. The predicted target variable is the expression strength. The feature size depends on the sequence length, typically ranging between 40-100 nucleotides or 160-400 features. If a classification is chosen, the output is binned according to a parameter provided by the user ($Response\_Value$ in \textit{config.txt}). If $Response\_Value=1$, the original activity values are used; if the $Response\_Value=0$, the data is centered with zero mean and unit variance and for larger values, bins are generated as equal-sized buckets (\textit{python pandas} \textit{qcut}, RRID:\verb:SCR_018214:), and the bin label is used as the target prediction. The data is split into training and test set, with a default ratio of 9:1 and a grid search on the training set identifies the optimal hyper-parameter with 100 fold cross-validation.
 
-Additional feature selection procedures were implemented to increase performance. During feature selection, the number of nucleotides that serve as features can be reduced to optimize training. Reasonable predictions rely on a sufficient variety of nucleotides tested at each position ($H_i$), and a cut-off can be chosen in the configuration file to exclude positions below a defined value of $H_i$. However, note that non-canonical nucleotides in conserved promoter (box)-regions can result in severe expression deficiencies. Thus, a low diversity can also reflect critical nucleotides associated with difficulties to sample experimentally.   
+Additional feature selection procedures were implemented to increase performance. During feature selection, the number of nucleotides that serve as features can be reduced to optimize training. Reasonable predictions rely on a sufficient variety of nucleotides tested at each position ($H_i$), and a cut-off can be chosen in the configuration file to exclude positions below a defined value of $H_i$. However, note that unconserved nucleotides in conserved promoter (box)-regions can result in severe expression deficiencies. Thus, a low diversity can also reflect critical nucleotides associated with difficulties to sample experimentally.   
 
 \subsection{Machine learning performance}
-The performance evaluation provides metrics for correlating the experimental and predicted outcomes and informs about important features for tree-based methods. The performance evaluation is based on cross-validation with 9:1 data separation that jointly moves identical sequences (\textit{i.e.}, replicates) to test- or training- sets. Thus, the test sequences are unknown to the regressor. The performance evaluation is based on the R2- (regression) and weighted F1-score (classification) (and optionally Matthews correlation coefficient) for the training set and the test set. The prediction uncertainty metric is determined by the coefficient of variance of the mean R2 and F1 prediction of the cross-validated training set. The tree-based methods allow the extraction of feature importance and represent the contributions of each nucleotide-position and are visualized with Logo-plots \citep{Tareen2019}. Moreover, single decision trees can be exported.
+The performance evaluation provides metrics for correlating the experimental and predicted outcomes and informs about important features for tree-based methods. The performance evaluation is based on 25-fold cross-validation with 9:1 data separation that jointly moves identical sequences (\textit{i.e.}, replicates) to test- or training- sets. Thus, the test sequences are unknown to the regressor. The performance evaluation is based on the R2- (regression) and weighted F1-score (classification) (and optionally Matthews correlation coefficient) for the training set and the test set. The prediction uncertainty metric is determined by the coefficient of variance of the mean R2 and F1 prediction of the cross-validated training set. The tree-based methods allow the extraction of feature importance and represent the contributions of each nucleotide-position and are visualized with Logo-plots \citep{Tareen2019}. Moreover, single decision trees can be exported.
 
 \subsection{Promoter design by optimization}
-The ability to design new promoters with desired activities is required for effective strain engineering. The predictors resulting from the machine-learning training are used to search promoters and expression with a genetic algorithm based on the Python framework DEAP \citep{Fortin2012}. A genetic optimization algorithm is used as it can be easily applied to a wide variety of machine learning models. %Notably, deterministic global methods can guarantee the identification of global solutions and have recently been applied to complex machine learning models \citep{Schweidtmann2019,Schweidtmann2020,Thebelt2020}.
+The ability to design new promoters with desired activities is required for effective strain engineering. The predictors resulting from the machine-learning training are used to search promoters and expression with a genetic algorithm based on the Python framework DEAP \citep{Fortin2012}. A genetic optimization algorithm is used as it can be easily applied to a wide variety of machine learning models. The initial population is composed of random sequences and point mutations and crossing-over is used to search the sequence space.%Notably, deterministic global methods can guarantee the identification of global solutions and have recently been applied to complex machine learning models \citep{Schweidtmann2019,Schweidtmann2020,Thebelt2020}.
 Sequence identification for a regressor is conducted with a search for the sequence with the closest expression. The classification requires that the predicted expression lies within the target expression class while the sequence distance to the reference sequences is minimized. The sequences already present in the library are excluded from the search. 
 
 \subsection{Experimental library construction}
@@ -192,7 +193,7 @@ A classification estimator can predict the approximate magnitude of expression. 
 
 
 \subsection{Cross-library analysis}
-In the following, six published bacterial promoter libraries were analyzed to highlight the effect of the library design on the estimation quality. The data is available online in the \textit{Exp2Ipynb} package at GitHub. The libraries were measured in \textit{E.\,coli}, \textit{Geobacillus thermoglucosidasius}, and \textit{B.\,subtilis} and were targeted to specific or unknown sigma factors. All libraries differ in terms of combinations of library sample size, tested sequence length and sequence diversity (Table \ref{Tab:LibrComp}). 
+In the following, six published bacterial promoter libraries were analyzed separately to highlight the effect of the library design on the estimation quality. The data is available online in the \textit{Exp2Ipynb} package at GitHub. The libraries were measured in \textit{E.\,coli}, \textit{Geobacillus thermoglucosidasius}, and \textit{B.\,subtilis} and were targeted to specific or unknown sigma factors. All libraries differ in terms of combinations of library sample size, tested sequence length and sequence diversity (Table \ref{Tab:LibrComp}). 
 
 % \begin{table}[!t]
 %     \processtable{Details of the six published libraries used to compare estimation quality in response to the experimental design. The columns \textit{n} represent total sample size, \textit{Feat.} the size of the input vector, \textit{Avg.Seq.Distance} the average distance of all sequences to a reference sequence, composed of the most common nucleotide at each position. A comprehensive table with numerical values of Figure \ref{Fig:CompLibraryAnal} in the supplementary data. Multiple transcription factors are responsible for gene expression in the data set of \cite{Gilman2019}, hence is not applicable (\textit{N.A.}).\label{Tab:LibrComp}}
@@ -299,6 +300,14 @@ The Jupyter Notebook of Exp2Ipynb with the data in this article is freely availa
 %%%  NB logo1.eps is required in the path in order to correctly compile front page header %%%
 \begin{figure*}[h!]%figure1
     \begin{center}
+        \includegraphics[width=.5\linewidth]{Figures/AvrgPosExpr.png}
+    \end{center}
+    \caption{Calculation scheme for the average, position dependent expression $\overline{Exp}$. The one-hot encoding of each promoter sequence is multiplied by the sequence dependent expression strength to yield the position expression. The position expressions are summed and divided by the sample number to arrive at the average expression for each nucleotide at each position.}
+    \label{Fig:AvgPosExp}
+\end{figure*}
+
+\begin{figure*}[h!]%figure
+    \begin{center}
         \includegraphics[width=.85\linewidth]{Figures/Pput-SampleDiversity.png}
     \end{center}
     \caption{(A): Promoter sampling diversity of the complete data set for nucleotide variations on each sequence position, transcription starts at 0 and (B): mutual sequence distances. The promoter library is based on our previously published library \citep{Kobbing2020}, with additional sequences totaling 63 different promoters with mutations directly upstream of the transcription start site. Two positions (\mbox{-13,-18}) were not mutated resulting in 28 tested positions.}
@@ -310,7 +319,7 @@ The Jupyter Notebook of Exp2Ipynb with the data in this article is freely availa
     \begin{center}
         \includegraphics[width=.85\linewidth]{Figures/2103_Pput-ConfMat.png}
     \end{center}
-    \caption{(A): Confusion matrix showing classification quality for training (n=56) and test set (n=7). The classification labels are 0: low (expression 0.2 - 16.6), 1: medium (16.6 - 24.8), 2: high (24.8 - 35.2)(\citep{Kobbing2020}). (B): Sequence logo of positions used by the random forest to predict expression activity class. The -35 and -10 box positions dominated the feature importance.}
+    \caption{(A): Confusion matrix showing classification quality for training (n=56) and test set (n=7) as predicted by the best random forest estimator. The classification labels are 0: low (expression 0.2 - 16.6), 1: medium (16.6 - 24.8), 2: high (24.8 - 35.2)(\citep{Kobbing2020}). (B): Sequence logo of positions used by the estimator to predict expression activity class. The -35 and -10 box positions dominated the feature importance.}
     \label{Fig:PputConfMatr}
 \end{figure*}
 
@@ -331,7 +340,7 @@ The Jupyter Notebook of Exp2Ipynb with the data in this article is freely availa
 \newpage
 \section*{Table captions}
 \begin{table}[h!]
-    \caption{Classification quality report for random forest (RF), gradient boosting trees (GBT) and support vector machine (SVM). The training was performed with the same Train(56)-Test(7) division with cross-validation on the training set (10\% hold-out). Nucleotide-position feature selection based on entropy threshold (0.2\,bits) resulted in 15 positions, in addition to GC-content (input vector: $15\times4+1$). Only tree-based methods (RF, GBT) extract the feature importance (FI). \label{Tab:PputML}}
+    \caption{Classification quality report for random forest (RF), gradient boosting trees (GBT) and support vector machine (SVM). \textit{Run time} reflects the computational time to train the respective machine-learning algorithm. \textit{CV:F1-score} is the result of cross-validation performed 25 times with split 9:1 on the training data. \textit{Train/Test:F1-score}, \textit{GC-content}, and \textit{Top 3 FI} are results of the best respective estimator for training and test set F1-score, the importance of the GC-content feature and the thre most important sequence positions along with the importance values. The training was performed with the same Train(56)-Test(7) division with cross-validation on the training set (100 times 9:1 split). Nucleotides included as features were filtered to contain at least an entropy of 0.2\,bits, which resulted in 15 positions, in addition to GC-content (input vector: $15\times4+1$). Only tree-based methods (RF, GBT) extract the feature importance (FI). \label{Tab:PputML}}
     {
     \begin{tabular}{@{}l|l|l|l@{}}
         \toprule
@@ -340,7 +349,7 @@ The Jupyter Notebook of Exp2Ipynb with the data in this article is freely availa
         CV:F1-score     & 0.42$\pm$0.19 & 0.5$\pm$0.22 & 0.47$\pm$0.21\\\hline
         Train:F1-score  & 0.58          & 0.89          & 0.88 \\\hline
         Test:F1-score   & 0.62          & 0.46          & 0.14 \\\hline
-        $GC$-content    & 2nd           & 1st           & N.A.\\\hline
+        GC-content    & 2nd           & 1st           & N.A.\\\hline
         Top 3 FI        & $-35:T:0.24$  & $-34:T:0.08$  & N.A.\\
                         & $-34:T:0.10$  & $-35:A:0.05$  & N.A.\\
                         & $-35:A:0.10$  & $-14:G:0.05$  & N.A.\\\botrule
@@ -351,12 +360,12 @@ The Jupyter Notebook of Exp2Ipynb with the data in this article is freely availa
 
 \newpage
 \begin{table}[h!]
-    \caption{Performance of newly designed promoters in comparison to reference promoters. The reference promoter is shown with the expression measured from the original data set and after the re-evaluation experiment. \label{Tab:PputNew}}
+    \caption{Performance of newly designed promoters. The reference promoter \textit{Ref:mod4\_1} was measured in the original data set and differs from the designed promoters only by single nucleotide changes. In the original data set, the reference promoter displayed a GFP expression activity of $9\pm2$ Units. \label{Tab:PputNew}}
     {
     \begin{tabular}{@{}l|l|l|l@{}}
         \toprule
         ID              & Seq.Diff.     & Prediction     & Experiment \\\hline%\midrule
-        Ref:mod4\_1      & GGTATAAT      & $9\pm2$       & $6.5\pm0.3$\\\hline
+        Ref:mod4\_1      & GGTATAAT      & $0.25-16.5$       & $6.5\pm0.3$\\\hline
         pred:0-1        & GGTA\textbf{C}AAT      & $0.25-16.5$   & $7.1\pm0.9$\\
         pred:0-2        & GGTAT\textbf{T}AT      & $0.25-16.5$   & $9.7\pm2.5$\\\hline
         % Ref:SPL14g\_14\_g& GGTATAAT     & $29$          & $26\pm1.5$ \\
@@ -417,3 +426,6 @@ The Jupyter Notebook of Exp2Ipynb with the data in this article is freely availa
 % rob.lavigne@kuleuven.be
 % KU Leuven
 % Leuven, Belgium
+
+% research context 
+% Strain engineering in biotechnology is a process during which new genes encoding new enzymes are integrated into host organisms to increase existing or enabling new reactions. For proper functioning within the host organisms, the amount of enzymes expressed from the integrated genes must be regulated. Promoter libraries are used to investigate how gene sequences affect the enzyme production. Our workflow Exp2Ipynb simplifies the analysis of promoter libraries to identify important sequence elements and to design promoter sequences with defined activities. The workflow can be modified flexibly to include alternative statistical or machine learning analysis approaches. Exp2Ipynb reduces the barrier to conduct the computational analysis and can function to harmonize reporting standards. After applying Exp2Ipynb to a diverse set of promoter libraries, we conclude that an explicit design of experiments is important for the machine learning approach to function effectively. The workflow of Exp2Ipynb is not only applicable to biotechnology, but also to other fields concerned with sequence analysis, e.g. disease phenotype or protein activity.
